@@ -21,7 +21,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.3.1'
+VERSION = '4.4.0'
 
 class Arz:
     def __init__(self):
@@ -554,7 +554,9 @@ class Arz:
         query = update.inline_query.query.strip().lower()
 
         data = await self.get_arz(MAIN_API)
-
+        if not data:
+            return
+        
         tether = data['crypto_prices']['items'][0]['price_toman']
         dollar = data['currency_prices']['items'][0]['sell_price']['value']
         eurro = data['currency_prices']['items'][1]['sell_price']['value']
@@ -672,11 +674,23 @@ class Arz:
 
         await update.inline_query.answer(result, cache_time=5)
 
-    async def send_daily(self, context: ContextTypes.DEFAULT_TYPE):
+    async def send_daily(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         self.data = self.load_price()
-        data = await self.get_arz(MAIN_API)
-        gold = await self.get_arz(GOLD_API)
-        oil = await self.get_arz(OIL)
+        try:
+            data = await self.get_arz(MAIN_API)
+            gold = await self.get_arz(GOLD_API)
+            oil = await self.get_arz(OIL)
+        except requests.RequestException:
+            if context.job:
+                return
+            await update.message.reply_text("❌ دریافت اطلاعات ناموفق بود. لطفاً کمی بعد دوباره تلاش کن.")
+            return
+        
+        if not data or not gold or not oil:
+            if context.job:
+                return
+            await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
+            return
 
         flag = False
         today = datetime.now(self.tehran).strftime('%m/%d/%Y')
@@ -817,6 +831,10 @@ class Arz:
             gold = await self.get_arz(GOLD_API)
         except requests.exceptions.RequestException:
             await update.message.reply_text("❌ دریافت اطلاعات ناموفق بود. لطفاً کمی بعد دوباره تلاش کن.")
+            return
+
+        if not data or not gold:
+            await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
             return
         
         if text == '💱 قیمت ارز ها 💱':
@@ -984,7 +1002,7 @@ class Arz:
             
         elif text == '💱 خلاصه قیمت ها 🪙':
             sent = await update.message.reply_text('⏳ در حال آماده‌سازی خلاصه‌ی بازار...')
-            result = await self.send_daily(context)
+            result = await self.send_daily(update, context)
 
             await sent.edit_text('📨 در حال آماده‌سازی گزارش...')
             await sent.delete()
@@ -1030,16 +1048,20 @@ class Arz:
 
             url = cars.get(text)
             try:
-                data = await self.get_car(f'{CAR_API}/dakheli/{url}')
+                car = await self.get_car(f'{CAR_API}/dakheli/{url}')
             except requests.exceptions.RequestException:
                 await sent.delete()
                 await update.message.reply_text("❌ دریافت اطلاعات ناموفق بود. لطفاً کمی بعد دوباره تلاش کن.")
                 return
-            
+
+            if not car:
+                await update.message.reply_text("⚠️ فعلا اطلاعات برای خودرو موجود نیست.")
+                return
+                        
             await sent.edit_text('📨 در حال آماده‌سازی فهرست خودروها...')
 
             message = ""
-            for item in data:
+            for item in car:
                 message += f"<tr><td>{item['name']}</td><td>{item['factory_price_txt']}</td><td>{item['bazar_price_txt']}</td><td>{item['change_price']:,}</td><td>{item['disagreement_price']}</td></tr>"
 
             html = f"""
@@ -1084,16 +1106,20 @@ class Arz:
 
             url = cars.get(text)
             try:
-                data = await self.get_car(f'{CAR_API}/varedati/{url}')
+                car = await self.get_car(f'{CAR_API}/varedati/{url}')
             except requests.exceptions.RequestException:
                 await sent.delete()
                 await update.message.reply_text("❌ دریافت اطلاعات ناموفق بود. لطفاً کمی بعد دوباره تلاش کن.")
+                return
+
+            if not car:
+                await update.message.reply_text("⚠️ فعلا اطلاعات برای خودرو موجود نیست.")
                 return
             
             await sent.edit_text('📨 در حال آماده‌سازی فهرست خودروها...')
 
             message = ""
-            for item in data:
+            for item in car:
                 message += f"<tr><td>{item['name']}</td><td>{item['factory_price_txt']}</td><td>{item['bazar_price_txt']}</td><td>{item['change_price']:,}</td><td>{item['disagreement_price']}</td></tr>"
 
             html = f"""
@@ -1130,6 +1156,10 @@ class Arz:
                 return
         
             if re.fullmatch(r'\s*[-0-9۰-۹٠٩]+(?:[.,][-0-9۰-۹٠٩]+)?\s+دلار\s*', user_text):
+                if not data:
+                    await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
+                    return
+                
                 normalized_text = user_text.translate(str.maketrans(
                     '۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩',
                     '01234567890123456789'
@@ -1145,6 +1175,10 @@ class Arz:
                 return
                 
             elif re.fullmatch(r'\s*[-0-9۰-۹٠٩]+(?:[.,][-0-9۰-۹٠٩]+)?\s+یورو\s*', user_text):
+                if not data:
+                    await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
+                    return
+                
                 normalized_text = user_text.translate(str.maketrans(
                     '۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩',
                     '01234567890123456789'
@@ -1160,6 +1194,10 @@ class Arz:
                 return
 
             elif re.fullmatch(r'\s*[0-9۰-۹٠-٩]+(?:[.,][0-9۰-۹٠-٩]+)?\s+(?:گرم(?:\s+طلا)?|طلا)\s*', user_text):
+                if not data:
+                    await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
+                    return
+                
                 normalized_text = user_text.translate(str.maketrans(
                     '۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩',
                     '01234567890123456789'
@@ -1175,6 +1213,10 @@ class Arz:
                 return
 
             elif re.fullmatch(r'\s*[0-9۰-۹٠-٩]+(?:[.,][0-9۰-۹٠-٩]+)?\s+(?:ریال(?:\s+عمان)?|عمان)\s*', user_text):
+                if not data:
+                    await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
+                    return
+                
                 normalized_text = user_text.translate(str.maketrans(
                     '۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩',
                     '01234567890123456789'
@@ -1189,19 +1231,22 @@ class Arz:
                 )
                 return
             
-            tether = data['crypto_prices']['items'][0]['price_toman']
-            dollar = data['currency_prices']['items'][0]['sell_price']['value']
-            eurro = data['currency_prices']['items'][1]['sell_price']['value']
-            seke_emami = data['gold_prices']['items'][2]['price']
-            tala_18 = data['gold_prices']['items'][1]['price']
+            try:
+                tether = data['crypto_prices']['items'][0]['price_toman']
+                dollar = data['currency_prices']['items'][0]['sell_price']['value']
+                eurro = data['currency_prices']['items'][1]['sell_price']['value']
+                seke_emami = data['gold_prices']['items'][2]['price']
+                tala_18 = data['gold_prices']['items'][1]['price']
 
-            prices = (
-                f"تتر: {int(tether):,}\n"
-                f"دلار: {int(dollar):,}\n"
-                f"یورو: {int(eurro):,}\n"
-                f"سکه امامی: {int(seke_emami):,}\n"
-                f"طلا ۱۸: {int(tala_18):,}"
-            )
+                prices = (
+                    f"تتر: {int(tether):,}\n"
+                    f"دلار: {int(dollar):,}\n"
+                    f"یورو: {int(eurro):,}\n"
+                    f"سکه امامی: {int(seke_emami):,}\n"
+                    f"طلا ۱۸: {int(tala_18):,}"
+                )
+            except Exception:
+                prices = "خطایی در دریافت قیمت ها رخ داده است."
 
             full_prompt = (
                 f"تو مشاور مالی ربات قیمت‌نما هستی.\n"
