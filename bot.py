@@ -21,7 +21,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.4.0'
+VERSION = '4.4.1'
 
 class Arz:
     def __init__(self):
@@ -706,16 +706,17 @@ class Arz:
             seke = data['gold_prices']['items'][3]['price'] or 0
             tala_18 = data['gold_prices']['items'][1]['price'] or 0
             bubble_tala_18 = data['gold_prices']['items'][1]['bubble']['amount'] or 0
-            gold_global = gold['data'][0]['price'] or 0
-            max_global = gold['data'][0]['max'] or 0
-            min_global = gold['data'][0]['min'] or 0
-            silver = gold['data'][1]['price'] or 0
-            max_silver = gold['data'][1]['max'] or 0
-            min_silver = gold['data'][1]['min'] or 0
             oil = oil['items'][0]['price'] or 0
         except Exception:
-            tether = dollar = eurro = seke_emami = seke = tala_18 = gold_global = silver = oil = max_global = min_global = max_silver = min_silver = bubble_tala_18 = 0
+            tether = dollar = eurro = seke_emami = seke = tala_18 = oil = bubble_tala_18 = 0
 
+        gold_global = gold['data'][0]['price'] or 0
+        max_global = gold['data'][0]['max'] or 0
+        min_global = gold['data'][0]['min'] or 0
+        silver = gold['data'][1]['price'] or 0
+        max_silver = gold['data'][1]['max'] or 0
+        min_silver = gold['data'][1]['min'] or 0
+        
         if int(tether) not in tether_data and int(tether) != 0:
             tether_data.append(int(tether))
             self.data['tether'] = tether_data
@@ -975,15 +976,15 @@ class Arz:
             try:
                 tala_18 = data['gold_prices']['items'][1]['price'] or 0
                 bubble_tala_18 = data['gold_prices']['items'][1]['bubble']['amount'] or 0
-                gold_global = gold['data'][0]['price'] or 0
-                max_global = gold['data'][0]['max'] or 0
-                min_global = gold['data'][0]['min'] or 0
-                silver = gold['data'][1]['price'] or 0
-                max_silver = gold['data'][1]['max'] or 0
-                min_silver = gold['data'][1]['min'] or 0
             except Exception:
-                tala_18 = gold_global = silver = bubble_tala_18 = 0
-                max_global = min_global = max_silver = min_silver = 0
+                tala_18 = bubble_tala_18 = 0
+
+            gold_global = gold['data'][0]['price'] or 0
+            max_global = gold['data'][0]['max'] or 0
+            min_global = gold['data'][0]['min'] or 0
+            silver = gold['data'][1]['price'] or 0
+            max_silver = gold['data'][1]['max'] or 0
+            min_silver = gold['data'][1]['min'] or 0
 
             flag = False
             today = datetime.now(self.tehran).strftime('%m/%d/%Y')
