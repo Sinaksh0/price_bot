@@ -716,7 +716,7 @@ class Arz:
         silver = gold['data'][1]['price'] or 0
         max_silver = gold['data'][1]['max'] or 0
         min_silver = gold['data'][1]['min'] or 0
-        
+
         if int(tether) not in tether_data and int(tether) != 0:
             tether_data.append(int(tether))
             self.data['tether'] = tether_data
@@ -1094,6 +1094,8 @@ class Arz:
                 </table>
             """
             await sent.delete()
+            await self.send_rich_message(update.effective_chat.id, html)
+            return
 
         elif text in ['هیوندای', 'کیا', 'تویوتا', 'بنز', 'بی ام و', 'فولکس واگن', 'مزدا', 'ولوو', 'آئودی', 'نیسان', 'هوندا', 'میتسوبیشی', 'MG', 'BYD', 'GAC', 'چانگان', 'ونوسیا', 'اشکودا']:
             sent = await update.message.reply_text('⏳ در حال دریافت قیمت خودروها...')
@@ -1147,6 +1149,8 @@ class Arz:
                 </table>
             """
             await sent.delete()
+            await self.send_rich_message(update.effective_chat.id, html)
+            return
 
         elif text == '🧮 تبدیل ارز به ریال 🧮':
             await update.message.reply_text('🧮 مقدار و نام موردنظر را بفرست؛ مثلاً:\n<b>10 دلار</b>\n<b>25 یورو</b>\n<b>30 ریال عمان</b>\n<b>30 گرم طلا</b> یا <b>30 گرم</b>', 
