@@ -1092,6 +1092,9 @@ class Arz:
                     <tr><th>🚘 خودرو</th><th>🏭 کارخانه</th><th>🏷️ بازار</th><th>📈 تغییر ۲۴ساعته</th><th>↔️ اختلاف</th></tr>
                     {message}
                 </table>
+                <tg-button-row>
+                    <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
+                </tg-button-row>
             """
             await sent.delete()
             await self.send_rich_message(update.effective_chat.id, html)
@@ -1147,6 +1150,9 @@ class Arz:
                     <tr><th>🚘 خودرو</th><th>🏭 کارخانه</th><th>🏷️ بازار</th><th>📈 تغییر ۲۴ساعته</th><th>↔️ اختلاف</th></tr>
                     {message}
                 </table>
+                <tg-button-row>
+                    <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
+                </tg-button-row>
             """
             await sent.delete()
             await self.send_rich_message(update.effective_chat.id, html)
