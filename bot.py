@@ -684,11 +684,6 @@ class Arz:
             if context.job:
                 await context.bot.send_message(context.job.chat_id, '⚠️ خطا در دریافت داده‌ها از سرور رخ داده است برای ارسال گزارش روزانه.')
                 return
-        
-        if not data['crypto_prices']['items'] or not data['currency_prices']['items'] or not data['gold_prices']['items'] or not gold['data'] or not oil['items']:
-            if context.job:
-                await context.bot.send_message(context.job.chat_id, '⚠️ خطا در دریافت داده‌ها از سرور رخ داده است برای ارسال گزارش روزانه.')
-                return
 
         flag = False
         today = datetime.now(self.tehran).strftime('%m/%d/%Y')
@@ -701,60 +696,68 @@ class Arz:
 
         if self.data.get('date') != today:
             self.data['date'] = today
+            flag = True
 
+        try:
+            tether = data['crypto_prices']['items'][0]['price_toman'] or 0
+            dollar = data['currency_prices']['items'][0]['sell_price']['value'] or 0
+            eurro = data['currency_prices']['items'][1]['sell_price']['value'] or 0
+            seke_emami = data['gold_prices']['items'][2]['price'] or 0
+            seke = data['gold_prices']['items'][3]['price'] or 0
+            tala_18 = data['gold_prices']['items'][1]['price'] or 0
+            bubble_tala_18 = data['gold_prices']['items'][1]['bubble']['amount'] or 0
+            gold_global = gold['data'][0]['price'] or 0
+            max_global = gold['data'][0]['max'] or 0
+            min_global = gold['data'][0]['min'] or 0
+            silver = gold['data'][1]['price'] or 0
+            max_silver = gold['data'][1]['max'] or 0
+            min_silver = gold['data'][1]['min'] or 0
+            oil = oil['items'][0]['price'] or 0
+        except Exception:
+            tether = dollar = eurro = seke_emami = seke = tala_18 = gold_global = silver = oil = max_global = min_global = max_silver = min_silver = bubble_tala_18 = 0
 
-        tether = data['crypto_prices']['items'][0]
-        dollar = data['currency_prices']['items'][0]
-        eurro = data['currency_prices']['items'][1]
-        seke_emami = data['gold_prices']['items'][2]
-        seke = data['gold_prices']['items'][3]
-        tala_18 = data['gold_prices']['items'][1]
-        gold_global = gold['data'][0]
-        silver = gold['data'][1]
-        oil = oil['items'][0]
-
-        if int(tether['price_toman']) not in tether_data:
-            tether_data.append(int(tether['price_toman']))
+        if int(tether) not in tether_data and int(tether) != 0:
+            tether_data.append(int(tether))
             self.data['tether'] = tether_data
             flag = True
 
-        if int(dollar['sell_price']['value']) not in usd_data:
-            usd_data.append(int(dollar['sell_price']['value']))
+        if int(dollar) not in usd_data and int(dollar) != 0:
+            usd_data.append(int(dollar))
             self.data['usd'] = usd_data
             flag = True
 
-        if int(eurro['sell_price']['value']) not in eur_data:
-            eur_data.append(int(eurro['sell_price']['value']))
+        if int(eurro) not in eur_data and int(eurro) != 0:
+            eur_data.append(int(eurro))
             self.data['eur'] = eur_data
             flag = True
 
-        if int(seke_emami['price']) not in emami_data:
-            emami_data.append(int(seke_emami['price']))
+        if int(seke_emami) not in emami_data and int(seke_emami) != 0:
+            emami_data.append(int(seke_emami))
             self.data['emami'] = emami_data
             flag = True
 
-        if int(seke['price']) not in azadi_data:
-            azadi_data.append(int(seke['price']))
+        if int(seke) not in azadi_data and int(seke) != 0:
+            azadi_data.append(int(seke))
             self.data['azadi'] = azadi_data
             flag = True
 
-        if int(tala_18['price']) not in tala_data:
-            tala_data.append(int(tala_18['price']))
+        if int(tala_18) not in tala_data and int(tala_18) != 0:
+            tala_data.append(int(tala_18))
             self.data['gold'] = tala_data
             flag = True
 
-        tether_max = max(tether_data)
-        tether_min = min(tether_data)
-        usd_max = max(usd_data)
-        usd_min = min(usd_data)
-        eur_max = max(eur_data)
-        eur_min = min(eur_data)
-        emami_max = max(emami_data)
-        emami_min = min(emami_data)
-        azadi_max = max(azadi_data)
-        azadi_min = min(azadi_data)
-        tala_max = max(tala_data)
-        tala_min = min(tala_data)
+        tether_max = max(tether_data) or 0
+        tether_min = min(tether_data) or 0
+        usd_max = max(usd_data) or 0
+        usd_min = min(usd_data) or 0
+        eur_max = max(eur_data) or 0
+        eur_min = min(eur_data) or 0
+        emami_max = max(emami_data) or 0
+        emami_min = min(emami_data) or 0
+        azadi_max = max(azadi_data) or 0
+        azadi_min = min(azadi_data) or 0
+        tala_max = max(tala_data) or 0
+        tala_min = min(tala_data) or 0
 
         html = f"""
         <h3>💱 گزارش خلاصه بازار 🪙</h3>
@@ -762,23 +765,29 @@ class Arz:
 
         <table bordered striped compact>
             <tr><th>عنوان</th><th>💵 نرخ فروش</th><th>⬆️ بیشینه</th><th>⬇️ کمینه</th><th>🫧 حباب</th></tr>
-            <tr><td>\U0001f4b8 تتر</td><td>{int(tether['price_toman']):,}</td><td>{tether_max:,}</td><td>{tether_min:,}</td><td>---</td></tr>
-            <tr><td>\U0001f4b5 دلار</td><td>{int(dollar['sell_price']['value']):,}</td><td>{usd_max:,}</td><td>{usd_min:,}</td><td>---</td></tr>
-            <tr><td>💷 یورو</td><td>{int(eurro['sell_price']['value']):,}</td><td>{eur_max:,}</td><td>{eur_min:,}</td><td>---</td></tr>
-            <tr><td>🪙 سکه امامی</td><td>{int(seke_emami['price']):,}</td><td>{emami_max:,}</td><td>{emami_min:,}</td><td>{int(seke_emami['bubble']['amount']):,}</td></tr>
-            <tr><td>🪙 سکه بهار آزادی</td><td>{int(seke['price']):,}</td><td>{azadi_max:,}</td><td>{azadi_min:,}</td><td>{int(seke['bubble']['amount']):,}</td></tr>
-            <tr><td>💰 طلای 18 عیار</td><td>{int(tala_18['price']):,}</td><td>{tala_max:,}</td><td>{tala_min:,}</td><td>{int(tala_18['bubble']['amount']):,}</td></tr>
-            <tr><td>🥇 انس طلا</td><td>{gold_global['price']}</td><td>{gold_global['max']}</td><td>{gold_global['min']}</td><td>---</td></tr>
-            <tr><td>🥈 انس نقره</td><td>{silver['price']}</td><td>{silver['max']}</td><td>{silver['min']}</td><td>---</td></tr>
-            <tr><td>🛢️ {oil['name']}</td><td>{oil['price']} دلار</td><td>---</td><td>---</td><td>---</td></tr>
+            <tr><td>\U0001f4b8 تتر</td><td>{int(tether):,}</td><td>{tether_max:,}</td><td>{tether_min:,}</td><td>---</td></tr>
+            <tr><td>\U0001f4b5 دلار</td><td>{int(dollar):,}</td><td>{usd_max:,}</td><td>{usd_min:,}</td><td>---</td></tr>
+            <tr><td>💷 یورو</td><td>{int(eurro):,}</td><td>{eur_max:,}</td><td>{eur_min:,}</td><td>---</td></tr>
+            <tr><td>🪙 سکه امامی</td><td>{int(seke_emami):,}</td><td>{emami_max:,}</td><td>{emami_min:,}</td><td>{int(seke_emami):,}</td></tr>
+            <tr><td>🪙 سکه بهار آزادی</td><td>{int(seke):,}</td><td>{azadi_max:,}</td><td>{azadi_min:,}</td><td>{int(seke):,}</td></tr>
+            <tr><td>💰 طلای 18 عیار</td><td>{int(tala_18):,}</td><td>{tala_max:,}</td><td>{tala_min:,}</td><td>{int(bubble_tala_18):,}</td></tr>
+            <tr><td>🥇 انس طلا</td><td>{gold_global}</td><td>{max_global}</td><td>{min_global}</td><td>---</td></tr>
+            <tr><td>🥈 انس نقره</td><td>{silver}</td><td>{max_silver}</td><td>{min_silver}</td><td>---</td></tr>
+            <tr><td>🛢️ نفت برنت</td><td>{oil} دلار</td><td>---</td><td>---</td></tr>
         </table>
-        <tg-button-row>
-            <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
-        </tg-button-row>
         """
 
         if flag:
             self.upload_data(self.data, 'prices')
+
+        if not data['crypto_prices']['items'] or not data['currency_prices']['items'] or not data['gold_prices']['items'] or not gold['data']:
+            html += "<blockquote>⚠️ خطایی در دریافت اطلاعات رخ داده است.</blockquote>"
+
+        html += """
+            <tg-button-row>
+                <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
+            </tg-button-row>
+        """
 
         if context.job is not None:
             await self.send_rich_message(context.job.chat_id, html)
@@ -829,33 +838,41 @@ class Arz:
         except Exception:
             await update.message.reply_text("❌ دریافت اطلاعات ناموفق بود. لطفاً کمی بعد دوباره تلاش کن.")
             return
-
-        if not data['crypto_prices']['items'] or not data['currency_prices']['items'] or not data['gold_prices']['items'] or not gold['data']:
-            await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
-            return
         
         self.data = self.load_price()
 
         if text == '💱 قیمت ارز ها 💱':
             sent = await update.message.reply_text('⏳ در حال دریافت قیمت‌ها...')
-            data = data['currency_prices']['items']
-            dollar = data[0]
-            eurro = data[1]
-            eur_rate = eurro["usd_rate"]["value"]
-            canada = data[6]
-            can_rate = canada["usd_rate"]["value"]
-            derham = data[2]
-            der_rate = derham["usd_rate"]["value"]
-            lir = data[3]
-            lir_rate = lir["usd_rate"]["value"]
-            pond = data[4]
-            pond_rate = pond["usd_rate"]["value"]
-            dinar = data[9]
-            dinar_rate = dinar["usd_rate"]["value"]
-            oman = data[15]
-            oman_rate = oman["usd_rate"]["value"]
-            arab = data[19]
-            arab_rate = arab["usd_rate"]["value"]
+            try:
+                
+                dollar = data['currency_prices']['items'][0]['sell_price']['value'] or 0
+                eurro = data['currency_prices']['items'][1]['sell_price']['value'] or 0
+                eur_rate = data['currency_prices']['items'][1]['usd_rate']['value'] or 0
+
+                canada = data['currency_prices']['items'][6]['sell_price']['value'] or 0
+                can_rate = data['currency_prices']['items'][6]['usd_rate']['value'] or 0
+                
+                derham = data['currency_prices']['items'][2]['sell_price']['value'] or 0
+                der_rate = data['currency_prices']['items'][2]['usd_rate']['value'] or 0
+                
+                lir = data['currency_prices']['items'][3]['sell_price']['value'] or 0
+                lir_rate = data['currency_prices']['items'][3]['usd_rate']['value'] or 0
+                
+                pond = data['currency_prices']['items'][4]['sell_price']['value'] or 0
+                pond_rate = data['currency_prices']['items'][4]['usd_rate']['value'] or 0
+                
+                dinar = data['currency_prices']['items'][9]['sell_price']['value'] or 0
+                dinar_rate = data['currency_prices']['items'][9]['usd_rate']['value'] or 0
+                
+                oman = data['currency_prices']['items'][15]['sell_price']['value'] or 0
+                oman_rate = data['currency_prices']['items'][15]['usd_rate']['value'] or 0
+                
+                arab = data['currency_prices']['items'][19]['sell_price']['value'] or 0
+                arab_rate = data['currency_prices']['items'][19]['usd_rate']['value'] or 0
+
+            except Exception:
+                dollar = eurro = eur_rate = canada = can_rate = derham = der_rate = 0
+                lir = lir_rate = pond = pond_rate = dinar = dinar_rate = oman = oman_rate = arab = arab_rate = 0
 
             await sent.edit_text('📨 در حال آماده‌سازی گزارش...')
 
@@ -865,27 +882,21 @@ class Arz:
 
                 <table bordered striped compact>
                     <tr><th>نماد</th><th>💱 ارز</th><th>\U0001f4b0 نرخ فروش</th><th>💵 نسبت به دلار</tr>
-                    <tr><td>🇺🇸</td><td>دلار آمریکا</td><td>{int(dollar['sell_price']['value']):,}</td><td>---</td></tr>
-                    <tr><td>🇪🇺</td><td>یورو اروپا</td><td>{int(eurro['sell_price']['value']):,}</td><td>{eur_rate}</td></tr>
-                    <tr><td>🇨🇦</td><td>دلار کانادا</td><td>{int(canada['sell_price']['value']):,}</td><td>{can_rate}</td></tr>
-                    <tr><td>🇦🇪</td><td>درهم امارات</td><td>{int(derham['sell_price']['value']):,}</td><td>{der_rate}</td></tr>
-                    <tr><td>🇹🇷</td><td>لیر ترکیه</td><td>{int(lir['sell_price']['value']):,}</td><td>{lir_rate}</td></tr>
-                    <tr><td>🇬🇧</td><td>پوند انگلیس</td><td>{int(pond['sell_price']['value']):,}</td><td>{pond_rate}</td></tr>
-                    <tr><td>🇮🇶</td><td>صد دینار عراق</td><td>{int(dinar['sell_price']['value']):,}</td><td>{dinar_rate}</td></tr>
-                    <tr><td>🇴🇲</td><td>ریال عمان</td><td>{int(oman['sell_price']['value']):,}</td><td>{oman_rate}</td></tr>
-                    <tr><td>🇸🇦</td><td>ریال عربستان</td><td>{int(arab['sell_price']['value']):,}</td><td>{arab_rate}</td></tr>
+                    <tr><td>🇺🇸</td><td>دلار آمریکا</td><td>{int(dollar):,}</td><td>---</td></tr>
+                    <tr><td>🇪🇺</td><td>یورو اروپا</td><td>{int(eurro):,}</td><td>{eur_rate}</td></tr>
+                    <tr><td>🇨🇦</td><td>دلار کانادا</td><td>{int(canada):,}</td><td>{can_rate}</td></tr>
+                    <tr><td>🇦🇪</td><td>درهم امارات</td><td>{int(derham):,}</td><td>{der_rate}</td></tr>
+                    <tr><td>🇹🇷</td><td>لیر ترکیه</td><td>{int(lir):,}</td><td>{lir_rate}</td></tr>
+                    <tr><td>🇬🇧</td><td>پوند انگلیس</td><td>{int(pond):,}</td><td>{pond_rate}</td></tr>
+                    <tr><td>🇮🇶</td><td>صد دینار عراق</td><td>{int(dinar):,}</td><td>{dinar_rate}</td></tr>
+                    <tr><td>🇴🇲</td><td>ریال عمان</td><td>{int(oman):,}</td><td>{oman_rate}</td></tr>
+                    <tr><td>🇸🇦</td><td>ریال عربستان</td><td>{int(arab):,}</td><td>{arab_rate}</td></tr>
                 </table>
-                <tg-button-row>
-                    <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
-                </tg-button-row>
             """
             await sent.delete()
-            await self.send_rich_message(update.effective_chat.id, html)
-            return
             
         elif text == '🪙 قیمت سکه 🪙':
             sent = await update.message.reply_text('⏳ در حال دریافت قیمت سکه‌ها...')
-            data = data['gold_prices']['items']
 
             flag = False
             today = datetime.now(self.tehran).strftime('%m/%d/%Y')
@@ -896,40 +907,49 @@ class Arz:
 
             if self.data.get('date') != today:
                 self.data['date'] = today
+                flag = True
 
-            emami = data[2]
-            azadi = data[3]
-            nim = data[4]
-            rob = data[5]
+            try:
+                emami = data['gold_prices']['items'][2]['price'] or 0
+                bubble_emami = data['gold_prices']['items'][2]['bubble']['amount'] or 0
+                azadi = data['gold_prices']['items'][3]['price'] or 0 
+                bubble_azadi = data['gold_prices']['items'][3]['bubble']['amount'] or 0
+                nim = data['gold_prices']['items'][4]['price'] or 0
+                bubble_nim = data['gold_prices']['items'][4]['bubble']['amount'] or 0
+                rob = data['gold_prices']['items'][5]['price'] or 0
+                bubble_rob = data['gold_prices']['items'][5]['bubble']['amount'] or 0
+            except Exception:
+                emami = azadi = nim = rob = 0
+                bubble_emami = bubble_azadi = bubble_nim = bubble_rob = 0
 
-            if int(emami['price']) not in emami_data:
-                emami_data.append(int(emami['price']))
+            if int(emami) not in emami_data and emami != 0:
+                emami_data.append(int(emami))
                 self.data['emami'] = emami_data
                 flag = True
 
-            if int(azadi['price']) not in azadi_data:
-                azadi_data.append(int(azadi['price']))
+            if int(azadi) not in azadi_data and azadi != 0:
+                azadi_data.append(int(azadi))
                 self.data['azadi'] = azadi_data
                 flag = True
 
-            if int(nim['price']) not in nim_data:
-                nim_data.append(int(nim['price']))
+            if int(nim) not in nim_data and nim != 0:
+                nim_data.append(int(nim))
                 self.data['nim'] = nim_data
                 flag = True
 
-            if int(rob['price']) not in rob_data:
-                rob_data.append(int(rob['price']))
+            if int(rob) not in rob_data and rob != 0:
+                rob_data.append(int(rob))
                 self.data['rob'] = rob_data
                 flag = True
 
-            max_emami = max(emami_data)
-            min_emami = min(emami_data)
-            max_azadi = max(azadi_data)
-            min_azadi = min(azadi_data)
-            max_nim = max(nim_data)
-            min_nim = min(nim_data)
-            max_rob = max(rob_data)
-            min_rob = min(rob_data)
+            max_emami = max(emami_data) or 0
+            min_emami = min(emami_data) or 0
+            max_azadi = max(azadi_data) or 0
+            min_azadi = min(azadi_data) or 0
+            max_nim = max(nim_data) or 0
+            min_nim = min(nim_data) or 0
+            max_rob = max(rob_data) or 0
+            min_rob = min(rob_data) or 0
 
             await sent.edit_text('📨 در حال آماده‌سازی گزارش...')
 
@@ -939,27 +959,31 @@ class Arz:
 
                 <table bordered striped compact>
                     <tr><th>نوع سکه</th><th>💵 قیمت فعلی</th><th>⬆️ بیشینه</th><th>⬇️ کمینه</th><th>🫧 حباب</th></tr>
-                    <tr><td>🪙 سکه امامی</td><td>{int(emami['price']):,}</td><td>{max_emami:,}</td><td>{min_emami:,}</td><td>{int(emami['bubble']['amount']):,}</td></tr>
-                    <tr><td>🪙 سکه بهار آزادی</td><td>{int(azadi['price']):,}</td><td>{max_azadi:,}</td><td>{min_azadi:,}</td><td>{int(azadi['bubble']['amount']):,}</td></tr>
-                    <tr><td>🪙 نیم سکه</td><td>{int(nim['price']):,}</td><td>{max_nim:,}</td><td>{min_nim:,}</td><td>{int(nim['bubble']['amount']):,}</td></tr>
-                    <tr><td>🪙 ربع سکه</td><td>{int(rob['price']):,}</td><td>{max_rob:,}</td><td>{min_rob:,}</td><td>{int(rob['bubble']['amount']):,}</td></tr>
+                    <tr><td>🪙 سکه امامی</td><td>{int(emami):,}</td><td>{max_emami:,}</td><td>{min_emami:,}</td><td>{int(bubble_emami):,}</td></tr>
+                    <tr><td>🪙 سکه بهار آزادی</td><td>{int(azadi):,}</td><td>{max_azadi:,}</td><td>{min_azadi:,}</td><td>{int(bubble_azadi):,}</td></tr>
+                    <tr><td>🪙 نیم سکه</td><td>{int(nim):,}</td><td>{max_nim:,}</td><td>{min_nim:,}</td><td>{int(bubble_nim):,}</td></tr>
+                    <tr><td>🪙 ربع سکه</td><td>{int(rob):,}</td><td>{max_rob:,}</td><td>{min_rob:,}</td><td>{int(bubble_rob):,}</td></tr>
                 </table>
-                <tg-button-row>
-                    <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
-                </tg-button-row>
             """
             await sent.delete()
-            await self.send_rich_message(update.effective_chat.id, html)
 
             if flag:
                 self.upload_data(self.data, 'prices')
-            return
             
         elif text == '💰 قیمت طلا 💰':
             sent = await update.message.reply_text('⏳ در حال دریافت قیمت طلا...')
-            tala_18 = data['gold_prices']['items'][1]
-            gold_global = gold['data'][0]
-            silver = gold['data'][1]
+            try:
+                tala_18 = data['gold_prices']['items'][1]['price'] or 0
+                bubble_tala_18 = data['gold_prices']['items'][1]['bubble']['amount'] or 0
+                gold_global = gold['data'][0]['price'] or 0
+                max_global = gold['data'][0]['max'] or 0
+                min_global = gold['data'][0]['min'] or 0
+                silver = gold['data'][1]['price'] or 0
+                max_silver = gold['data'][1]['max'] or 0
+                min_silver = gold['data'][1]['min'] or 0
+            except Exception:
+                tala_18 = gold_global = silver = bubble_tala_18 = 0
+                max_global = min_global = max_silver = min_silver = 0
 
             flag = False
             today = datetime.now(self.tehran).strftime('%m/%d/%Y')
@@ -967,14 +991,15 @@ class Arz:
 
             if self.data['date'] != today:
                 self.data['date'] = today
+                flag = True
 
-            if int(tala_18['price']) not in tala_data:
-                tala_data.append(int(tala_18['price']))
+            if int(tala_18) not in tala_data and tala_18 != 0:
+                tala_data.append(int(tala_18))
                 self.data['gold'] = tala_data
                 flag = True
 
-            max_price = max(tala_data)
-            min_price = min(tala_data)
+            max_price = max(tala_data) or 0
+            min_price = min(tala_data) or 0
 
             await sent.edit_text('📨 در حال آماده‌سازی گزارش...')
 
@@ -984,28 +1009,23 @@ class Arz:
 
                 <table bordered compact>
                     <tr><th>شاخص</th><th>💵 مقدار</th><th>⬆️ بیشینه</th><th>⬇️ کمینه</th><th>🫧 حباب</th></tr>
-                    <tr><td>💰 طلای 18 عیار</td><td>{int(tala_18['price']):,}</td><td>{max_price:,}</td><td>{min_price:,}</td><td>{int(tala_18['bubble']['amount']):,}</td></tr>
-                    <tr><td>🥇 انس طلا</td><td>{gold_global['price']}</td><td>{gold_global['max']}</td><td>{gold_global['min']}</td><td>---</td></tr>
-                    <tr><td>🥈 انس نقره</td><td>{silver['price']}</td><td>{silver['max']}</td><td>{silver['min']}</td><td>---</td></tr>
+                    <tr><td>💰 طلای 18 عیار</td><td>{int(tala_18):,}</td><td>{max_price:,}</td><td>{min_price:,}</td><td>{int(bubble_tala_18):,}</td></tr>
+                    <tr><td>🥇 انس طلا</td><td>{gold_global}</td><td>{max_global}</td><td>{min_global}</td><td>---</td></tr>
+                    <tr><td>🥈 انس نقره</td><td>{silver}</td><td>{max_silver}</td><td>{min_silver}</td><td>---</td></tr>
                 </table>
-                <tg-button-row>
-                    <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
-                </tg-button-row>
             """
             await sent.delete()
-            await self.send_rich_message(update.effective_chat.id, html)
 
             if flag:
                 self.upload_data(self.data, 'prices')
-            return
             
         elif text == '💱 خلاصه قیمت ها 🪙':
             sent = await update.message.reply_text('⏳ در حال آماده‌سازی خلاصه‌ی بازار...')
-            result = await self.send_daily(update, context)
+            html = await self.send_daily(update, context)
 
             await sent.edit_text('📨 در حال آماده‌سازی گزارش...')
             await sent.delete()
-            await self.send_rich_message(update.effective_chat.id, result)
+            await self.send_rich_message(update.effective_chat.id, html)
             return
             
         elif text == '🚗 خودرو های داخلی 🚗':
@@ -1071,13 +1091,8 @@ class Arz:
                     <tr><th>🚘 خودرو</th><th>🏭 کارخانه</th><th>🏷️ بازار</th><th>📈 تغییر ۲۴ساعته</th><th>↔️ اختلاف</th></tr>
                     {message}
                 </table>
-                <tg-button-row>
-                    <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
-                </tg-button-row>
             """
             await sent.delete()
-            await self.send_rich_message(update.effective_chat.id, html)
-            return
 
         elif text in ['هیوندای', 'کیا', 'تویوتا', 'بنز', 'بی ام و', 'فولکس واگن', 'مزدا', 'ولوو', 'آئودی', 'نیسان', 'هوندا', 'میتسوبیشی', 'MG', 'BYD', 'GAC', 'چانگان', 'ونوسیا', 'اشکودا']:
             sent = await update.message.reply_text('⏳ در حال دریافت قیمت خودروها...')
@@ -1129,19 +1144,25 @@ class Arz:
                     <tr><th>🚘 خودرو</th><th>🏭 کارخانه</th><th>🏷️ بازار</th><th>📈 تغییر ۲۴ساعته</th><th>↔️ اختلاف</th></tr>
                     {message}
                 </table>
-                <tg-button-row>
-                    <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
-                </tg-button-row>
             """
             await sent.delete()
-            await self.send_rich_message(update.effective_chat.id, html)
-
-            return
 
         elif text == '🧮 تبدیل ارز به ریال 🧮':
             await update.message.reply_text('🧮 مقدار و نام موردنظر را بفرست؛ مثلاً:\n<b>10 دلار</b>\n<b>25 یورو</b>\n<b>30 ریال عمان</b>\n<b>30 گرم طلا</b> یا <b>30 گرم</b>', 
                 parse_mode='HTML')
             return
+
+
+        if not data['crypto_prices']['items'] or not data['currency_prices']['items'] or not data['gold_prices']['items'] or not gold['data']:
+            html += "<blockquote>⚠️ خطایی در دریافت اطلاعات رخ داده است.</blockquote>"
+
+        html += """
+            <tg-button-row>
+                <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
+            </tg-button-row>
+        """
+        await self.send_rich_message(update.effective_chat.id, html)
+        return
 
     async def genai_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         await self.reaction(update, context)
