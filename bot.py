@@ -746,18 +746,18 @@ class Arz:
             self.data['gold'] = tala_data
             flag = True
 
-        tether_max = max(tether_data) or 0
-        tether_min = min(tether_data) or 0
-        usd_max = max(usd_data) or 0
-        usd_min = min(usd_data) or 0
-        eur_max = max(eur_data) or 0
-        eur_min = min(eur_data) or 0
-        emami_max = max(emami_data) or 0
-        emami_min = min(emami_data) or 0
-        azadi_max = max(azadi_data) or 0
-        azadi_min = min(azadi_data) or 0
-        tala_max = max(tala_data) or 0
-        tala_min = min(tala_data) or 0
+        tether_max = max(tether_data, default=0)
+        tether_min = min(tether_data, default=0)
+        usd_max = max(usd_data, default=0)
+        usd_min = min(usd_data, default=0)
+        eur_max = max(eur_data, default=0)
+        eur_min = min(eur_data, default=0)
+        emami_max = max(emami_data, default=0)
+        emami_min = min(emami_data, default=0)
+        azadi_max = max(azadi_data, default=0)
+        azadi_min = min(azadi_data, default=0)
+        tala_max = max(tala_data, default=0)
+        tala_min = min(tala_data, default=0)
 
         html = f"""
         <h3>💱 گزارش خلاصه بازار 🪙</h3>
@@ -942,14 +942,14 @@ class Arz:
                 self.data['rob'] = rob_data
                 flag = True
 
-            max_emami = max(emami_data) or 0
-            min_emami = min(emami_data) or 0
-            max_azadi = max(azadi_data) or 0
-            min_azadi = min(azadi_data) or 0
-            max_nim = max(nim_data) or 0
-            min_nim = min(nim_data) or 0
-            max_rob = max(rob_data) or 0
-            min_rob = min(rob_data) or 0
+            max_emami = max(emami_data, default=0)
+            min_emami = min(emami_data, default=0)
+            max_azadi = max(azadi_data, default=0)
+            min_azadi = min(azadi_data, default=0)
+            max_nim = max(nim_data, default=0)
+            min_nim = min(nim_data, default=0)
+            max_rob = max(rob_data, default=0)
+            min_rob = min(rob_data, default=0)
 
             await sent.edit_text('📨 در حال آماده‌سازی گزارش...')
 
@@ -998,8 +998,8 @@ class Arz:
                 self.data['gold'] = tala_data
                 flag = True
 
-            max_price = max(tala_data) or 0
-            min_price = min(tala_data) or 0
+            max_price = max(tala_data, default=0)
+            min_price = min(tala_data, default=0)
 
             await sent.edit_text('📨 در حال آماده‌سازی گزارش...')
 
