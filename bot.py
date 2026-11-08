@@ -674,7 +674,7 @@ class Arz:
 
         await update.inline_query.answer(result, cache_time=5)
 
-    async def send_daily(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def send_daily(self, context: ContextTypes.DEFAULT_TYPE):
         self.data = self.load_price()
         try:
             data = await self.get_arz(MAIN_API)
@@ -1022,7 +1022,7 @@ class Arz:
             
         elif text == '💱 خلاصه قیمت ها 🪙':
             sent = await update.message.reply_text('⏳ در حال آماده‌سازی خلاصه‌ی بازار...')
-            html = await self.send_daily(update, context)
+            html = await self.send_daily(context)
 
             await sent.edit_text('📨 در حال آماده‌سازی گزارش...')
             await sent.delete()
