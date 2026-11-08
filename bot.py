@@ -554,7 +554,7 @@ class Arz:
         query = update.inline_query.query.strip().lower()
 
         data = await self.get_arz(MAIN_API)
-        if not data:
+        if not data['crypto_prices']['items'] or not data['currency_prices']['items'] or not data['gold_prices']['items']:
             return
         
         tether = data['crypto_prices']['items'][0]['price_toman']
@@ -680,17 +680,15 @@ class Arz:
             data = await self.get_arz(MAIN_API)
             gold = await self.get_arz(GOLD_API)
             oil = await self.get_arz(OIL)
-        except requests.RequestException:
+        except Exception:
             if context.job:
+                await context.bot.send_message(context.job.chat_id, '⚠️ خطا در دریافت داده‌ها از سرور رخ داده است برای ارسال گزارش روزانه.')
                 return
-            await update.message.reply_text("❌ دریافت اطلاعات ناموفق بود. لطفاً کمی بعد دوباره تلاش کن.")
-            return
         
-        if not data or not gold or not oil:
+        if not data['crypto_prices']['items'] or not data['currency_prices']['items'] or not data['gold_prices']['items'] or not gold['data'] or not oil['items']:
             if context.job:
+                await context.bot.send_message(context.job.chat_id, '⚠️ خطا در دریافت داده‌ها از سرور رخ داده است برای ارسال گزارش روزانه.')
                 return
-            await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
-            return
 
         flag = False
         today = datetime.now(self.tehran).strftime('%m/%d/%Y')
@@ -820,23 +818,24 @@ class Arz:
     
     async def take_price(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = update.message.text
-        self.data = self.load_price()
-
         if text is None:
             return
+        
         await self.reaction(update, context)
 
         try:
             data = await self.get_arz(MAIN_API)
             gold = await self.get_arz(GOLD_API)
-        except requests.exceptions.RequestException:
+        except Exception:
             await update.message.reply_text("❌ دریافت اطلاعات ناموفق بود. لطفاً کمی بعد دوباره تلاش کن.")
             return
 
-        if not data or not gold:
+        if not data['crypto_prices']['items'] or not data['currency_prices']['items'] or not data['gold_prices']['items'] or not gold['data']:
             await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
             return
         
+        self.data = self.load_price()
+
         if text == '💱 قیمت ارز ها 💱':
             sent = await update.message.reply_text('⏳ در حال دریافت قیمت‌ها...')
             data = data['currency_prices']['items']
@@ -1107,7 +1106,7 @@ class Arz:
             url = cars.get(text)
             try:
                 car = await self.get_car(f'{CAR_API}/varedati/{url}')
-            except requests.exceptions.RequestException:
+            except Exception:
                 await sent.delete()
                 await update.message.reply_text("❌ دریافت اطلاعات ناموفق بود. لطفاً کمی بعد دوباره تلاش کن.")
                 return
@@ -1156,7 +1155,7 @@ class Arz:
                 return
         
             if re.fullmatch(r'\s*[-0-9۰-۹٠٩]+(?:[.,][-0-9۰-۹٠٩]+)?\s+دلار\s*', user_text):
-                if not data:
+                if not data['currency_prices']['items']:
                     await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
                     return
                 
@@ -1175,7 +1174,7 @@ class Arz:
                 return
                 
             elif re.fullmatch(r'\s*[-0-9۰-۹٠٩]+(?:[.,][-0-9۰-۹٠٩]+)?\s+یورو\s*', user_text):
-                if not data:
+                if not data['currency_prices']['items']:
                     await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
                     return
                 
@@ -1194,7 +1193,7 @@ class Arz:
                 return
 
             elif re.fullmatch(r'\s*[0-9۰-۹٠-٩]+(?:[.,][0-9۰-۹٠-٩]+)?\s+(?:گرم(?:\s+طلا)?|طلا)\s*', user_text):
-                if not data:
+                if not data['gold_prices']['items']:
                     await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
                     return
                 
@@ -1213,7 +1212,7 @@ class Arz:
                 return
 
             elif re.fullmatch(r'\s*[0-9۰-۹٠-٩]+(?:[.,][0-9۰-۹٠-٩]+)?\s+(?:ریال(?:\s+عمان)?|عمان)\s*', user_text):
-                if not data:
+                if not data['currency_prices']['items']:
                     await update.message.reply_text('⚠️ خطا در دریافت داده‌ها از سرور. لطفاً بعداً دوباره تلاش کنید.')
                     return
                 
