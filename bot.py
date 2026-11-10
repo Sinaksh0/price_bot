@@ -29,7 +29,6 @@ class Arz:
         self.fernet = Fernet(KEY)
         self.client = genai.Client(api_key=API_GEN)
         self.set = self.load_hours()
-        self.chat = self.load_state('chats')
 
         self.keyboard = [
             ['💱 خلاصه قیمت ها 🪙'],
@@ -1214,7 +1213,6 @@ class Arz:
 
             try:
                 await update.message.reply_text(result.text, parse_mode="HTML")
-                self.upload_github(self.chat, 'chats')
             except Exception as delivery_error:
                 await send_message.edit_text("⚠️ پاسخ آماده شد اما ارسال آن ناموفق بود. لطفاً دوباره تلاش کن.")
                 await context.bot.send_message(ADMIN_ID, f'⚠️ ارور ارسال پاسخ Gemini برای کاربر {update.effective_chat.id} | {update.effective_user.full_name}\n\n{delivery_error}\nمتن کاربر:\n{user_text}')
