@@ -205,7 +205,7 @@ class Arz:
             try:
                 await context.bot.send_message(
                     chat_id=user['ID'],
-                    text=f'✨ آپدیت تجمعی نسخه‌ی جدید v{VERSION} منتشر شد.\n\n'
+                    text=f'✨ آپدیت نسخه‌ی جدید v{VERSION} منتشر شد.\n\n'
                         '🔄 برای دریافت آخرین تغییرات، دستور زیر را بفرستید:\n'
                         '/update'
                 )
@@ -284,7 +284,7 @@ class Arz:
         await self.reaction(update, context)
 
         html = f"""
-            <h1>آپدیت تجمعی نسخه v{VERSION} ✨</h1>
+            <h1>آپدیت نسخه v{VERSION} ✨</h1>
 
             <h2>✨ تغییرات این نسخه</h2>
             <ul>
@@ -1214,12 +1214,12 @@ class Arz:
 
             try:
                 await update.message.reply_text(result.text, parse_mode="HTML")
-                await send_message.delete()
                 self.upload_github(self.chat, 'chats')
             except Exception as delivery_error:
                 await send_message.edit_text("⚠️ پاسخ آماده شد اما ارسال آن ناموفق بود. لطفاً دوباره تلاش کن.")
                 await context.bot.send_message(ADMIN_ID, f'⚠️ ارور ارسال پاسخ Gemini برای کاربر {update.effective_chat.id} | {update.effective_user.full_name}\n\n{delivery_error}\nمتن کاربر:\n{user_text}')
                 return
+            await send_message.delete()
             
         except Exception as e:
             await update.message.reply_text("❌ خطایی رخ داد. لطفاً مجدداً تلاش کنید.")
@@ -1283,6 +1283,6 @@ if __name__ == '__main__':
     application.add_handler(MessageHandler(filters.Regex(r'^⚙️ پنل مدیریت ⚙️$'), arz.admin_panel))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, arz.genai_handler, block=False))
     application.add_handler(CallbackQueryHandler(arz.handle_panel))
-    application.job_queue.run_once(arz.check_update, when=5)
+    #application.job_queue.run_once(arz.check_update, when=5)
 
     application.run_polling()
