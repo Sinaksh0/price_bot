@@ -21,7 +21,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.6.0'
+VERSION = '4.6.2'
 
 class Arz:
     def __init__(self):
@@ -689,7 +689,7 @@ class Arz:
 
         dollar = str(data['data']['currencies'][0]['price']).replace('٬', '')
         eurro = str(data['data']['currencies'][1]['price']).replace('٬', '')
-        seke_emami = gold_tala['data']['coins'][1]['price']
+        seke_emami = gold_tala['data']['coins'][0]['price']
         azadi = gold_tala['data']['coins'][1]['price']
         tala_18 = gold_tala['data']['gold'][0]['price']
         oil = data['data']['oil'][4]['price']
@@ -1150,7 +1150,7 @@ class Arz:
                     f'💰 {amount_text} گرم طلا = {int(toman):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
                 )
                 return
-
+            
             try:
                 dollar = str(data['data']['currencies'][0]['price']).replace('٬', '')
                 eurro = str(data['data']['currencies'][1]['price']).replace('٬', '')
@@ -1166,7 +1166,7 @@ class Arz:
             except Exception:
                 prices = "خطایی در دریافت قیمت ها رخ داده است."
 
-            chat_id = update.effective_chat.id
+            user_id = update.effective_user.id
             name_user = update.effective_user.full_name
 
             instruction = (
@@ -1174,20 +1174,19 @@ class Arz:
                 f"نام کاربر: {name_user}\n"
                 "قوانین:\n"
                 "1. اگر سوال مربوط به بازار و قیمت بود از نرخ‌ها استفاده کن، وگرنه متناسب با سوال پاسخ بده.\n"
-                "2. اگر کاربر سلام کرد، سلام میکنی. در  غیر اینصورت سلام نکن به هیچ عنوان.\n"
                 "3. به هیچ وجه از ستاره (* یا **) استفاده نکن.\n"
                 "4. برای برجسته‌سازی از تگ HTML مثل <b>متن</b> یا ایموجی استفاده کن."
             )
             
-            if chat_id not in self.chat:
-                self.chat[chat_id] = self.client.chats.create(model='gemini-3.5-flash-lite', config={'system_instruction': instruction})
+            if user_id not in self.chat:
+                self.chat[user_id] = self.client.chats.create(model='gemini-3.5-flash-lite', config={'system_instruction': instruction})
 
             full_prompt = (
                 f"نرخ‌های لحظه‌ای بازار:\n{prices}\n\n"
                 f"سوال کاربر: {user_text}"
             )
 
-            chat = self.chat[chat_id]
+            chat = self.chat[user_id]
             send_message = await update.message.reply_text('🤖 در حال دریافت پاسخ از Gemini...')
 
             try:
