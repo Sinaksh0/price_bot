@@ -29,6 +29,7 @@ class Arz:
         self.fernet = Fernet(KEY)
         self.client = genai.Client(api_key=API_GEN)
         self.set = self.load_hours()
+        self.chat = {}
 
         self.keyboard = [
             ['💱 خلاصه قیمت ها 🪙'],
