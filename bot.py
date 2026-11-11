@@ -21,7 +21,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.6.3'
+VERSION = '4.6.4'
 
 class Arz:
     def __init__(self):
@@ -1159,7 +1159,7 @@ class Arz:
             try:
                 dollar = str(data['data']['currencies'][0]['price']).replace('٬', '')
                 eurro = str(data['data']['currencies'][1]['price']).replace('٬', '')
-                seke_emami = tala['data']['coins'][0]['price']
+                seke_emami = gold_tala['data']['coins'][0]['price']
                 tala_18 = gold_tala['data']['gold'][0]['price']
 
                 prices = (
