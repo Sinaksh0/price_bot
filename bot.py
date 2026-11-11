@@ -21,7 +21,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.6.2'
+VERSION = '4.6.3'
 
 class Arz:
     def __init__(self):
@@ -757,6 +757,11 @@ class Arz:
             self.upload_data(self.data, 'prices')
 
         if context.job is not None:
+            html += """
+                <tg-button-row>
+                    <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
+                </tg-button-row>
+            """
             await self.send_rich_message(context.job.chat_id, html)
             return
         
@@ -1154,7 +1159,7 @@ class Arz:
             try:
                 dollar = str(data['data']['currencies'][0]['price']).replace('٬', '')
                 eurro = str(data['data']['currencies'][1]['price']).replace('٬', '')
-                seke_emami = str(data['data']['gold_coin'][0]['price']).replace('٬', '')
+                seke_emami = tala['data']['coins'][0]['price']
                 tala_18 = gold_tala['data']['gold'][0]['price']
 
                 prices = (
