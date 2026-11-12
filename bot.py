@@ -20,7 +20,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.7.0'
+VERSION = '4.7.1'
 
 class Arz:
     def __init__(self):
@@ -243,15 +243,22 @@ class Arz:
             )
         
         html = f"""
-            <p>سلام <strong>{name}</strong> 👋 به قیمت‌نما خوش اومدی؛ بازار رو با چند لمس دنبال کن.</p>
-            
-            <h3>✨ از اینجا شروع کن</h3>
+            <h1>سلام {name} عزیز! 👋</h1>
+            <p>به <b>قیمت‌نما</b> خوش اومدی؛ همراه هوشمندت برای پیگیری بازار و پاسخ به سؤال‌هات. 🌟</p>
+
+            <h2>🚀 چه کارهایی می‌تونی انجام بدی؟</h2>
             <ul>
-                <li>💱 نرخ ارزها و قیمت طلا</li>
-                <li>🪙 قیمت سکه‌ها و حباب بازار</li>
-                <li>🚗 قیمت روز خودروهای داخلی و وارداتی</li>
-                <li>🧮 تبدیل سریع ارز و طلا</li>
+                <li>💱 دیدن قیمت لحظه‌ای ارز، طلا و انواع سکه</li>
+                <li>🚗 بررسی قیمت خودروهای داخلی و وارداتی</li>
+                <li>🧮 تبدیل مبلغ ارز یا طلا به تومان؛ مثلاً <code>10 دلار</code></li>
+                <li>🤖 پرسیدن سؤال از هوش مصنوعی <b>Gemini</b>؛ پیامت رو همین‌جا بنویس</li>
+                <li>⏰ تنظیم گزارش خودکار قیمت با دستور <code>/set</code></li>
             </ul>
+
+            <h3>⚡ جست‌وجوی سریع در هر چت</h3>
+            <p>بنویس <code>@arzpricekshbot</code> و بعد نام مورد نظرت رو جست‌وجو کن؛ مثلاً <code>@arzpricekshbot دلار</code>. برای دیدن همه گزینه‌ها، فقط آیدی ربات رو وارد کن.</p>
+
+            <p>👇 از دکمه‌های منو شروع کن یا برای دیدن راهنمای کامل، /options رو بفرست.</p>
 
             <tg-button-row>
                 <tg-button type="url" style="success" url="https://t.me/SI_KSH">پشتیبانی ربات</tg-button>
@@ -639,9 +646,7 @@ class Arz:
             )
         ]
 
-        await update.inline_query.answer(result, cache_time=1)
-
-        query_list = []
+        query_list = result if not query else []
         if query in ['tether', 'تتر']:
             query_list.append(
                 InlineQueryResultArticle(
@@ -1216,7 +1221,7 @@ class Arz:
                     '01234567890123456789'
                 ))
                 amount_text = normalized_text.split()[0].replace(',', '.')
-                tala = data['gold_prices']['items'][1]['price']
+                tala = data['gold_prices']['items'][0]['price']
                 toman = float(amount_text) * int(tala)
                 time = datetime.now(self.tehran).strftime('%H:%M:%S | %Y/%m/%d')
 
