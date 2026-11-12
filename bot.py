@@ -771,7 +771,7 @@ class Arz:
         eurro = data['currency_prices']['items'][1]
         seke_emami = data['gold_prices']['items'][2]
         seke = data['gold_prices']['items'][3]
-        tala_18 = data['gold_prices']['items'][1]
+        tala_18 = data['gold_prices']['items'][0]
         gold_global = data['gold_prices']['items'][7]
         silver = data['gold_prices']['items'][8]
         oil = oil['items'][0]
