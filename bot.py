@@ -20,7 +20,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.7.1'
+VERSION = '4.7.4'
 
 class Arz:
     def __init__(self):
@@ -35,7 +35,7 @@ class Arz:
             ['🪙 قیمت سکه 🪙', '💰 قیمت طلا 💰'],
             ['💱 قیمت ارز ها 💱'],
             ['🚗 خودرو های وارداتی 🚗', '🚗 خودرو های داخلی 🚗'],
-            ['🧮 تبدیل ارز به ریال 🧮']
+            ['🧮 مبدل ارز و طلا به ریال 🧮']
         ]
 
         self.admin_keyborad = [
@@ -43,7 +43,7 @@ class Arz:
             ['🪙 قیمت سکه 🪙', '💰 قیمت طلا 💰'],
             ['💱 قیمت ارز ها 💱'],
             ['🚗 خودرو های وارداتی 🚗', '🚗 خودرو های داخلی 🚗'],
-            ['🧮 تبدیل ارز به ریال 🧮'],
+            ['🧮 مبدل ارز و طلا به ریال 🧮'],
             ['⚙️ پنل مدیریت ⚙️']
         ]
 
@@ -204,7 +204,7 @@ class Arz:
             try:
                 await context.bot.send_message(
                     chat_id=user['ID'],
-                    text=f'✨ آپدیت تجمعی نسخه‌ی جدید v{VERSION} منتشر شد.\n\n'
+                    text=f'✨ آپدیت نسخه‌ی جدید v{VERSION} منتشر شد.\n\n'
                         '🔄 برای دریافت آخرین تغییرات، دستور زیر را بفرستید:\n'
                         '/update'
                 )
@@ -290,7 +290,7 @@ class Arz:
         await self.reaction(update, context)
 
         html = f"""
-            <h1>آپدیت تجمعی نسخه v{VERSION} ✨</h1>
+            <h1>v{VERSION} ✨</h1>
 
             <h2>✨ تغییرات این نسخه</h2>
             <p>دستیار قدرتمند هوش مصنوعی <b>Google Gemini</b> به ربات اضافه شد!.🚀</p>
@@ -474,7 +474,7 @@ class Arz:
 
     async def handle_panel(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = update.callback_query
-        await query.answer()
+        await query.answer(text='⚙️ در حال پردازش درخواست...', show_alert=False)
 
         keyboard = [
             [InlineKeyboardButton('🔙 بازگشت', callback_data='back')]
@@ -525,7 +525,7 @@ class Arz:
                 if chat_id is None:
                     continue
                 try:
-                    await context.bot.send_message(chat_id=chat_id, text=f'📨 پیام از مدیر برای شما\n\n{msg}')
+                    await context.bot.send_message(chat_id=chat_id, text=f'📨 پیام از مدیر برای شما:\n\n{msg}')
                     sent += 1
                 except Exception:
                     failed += 1
@@ -535,7 +535,7 @@ class Arz:
         elif target.isdigit() or (target.startswith('-') and target[1:].isdigit()):
             try:
                 chat_id = int(target)
-                await context.bot.send_message(chat_id=chat_id, text=f'📨 پیام از مدیر برای شما\n\n{msg}')
+                await context.bot.send_message(chat_id=chat_id, text=f'📨 پیام از مدیر برای شما:\n\n{msg}')
                 await update.message.reply_text(f'✅ پیام با موفقیت به آیدی {chat_id} رسید.')
             except Exception as exc:
                 await update.message.reply_text(f'❌ ارسال پیام به آیدی {target} ناموفق بود.\nجزئیات: {exc}')
@@ -554,7 +554,7 @@ class Arz:
             return
         
         msg = text.replace('/send', '').strip()
-        await context.bot.send_message(chat_id=ADMIN_ID, text=f'📨 پیام از {update.effective_user.full_name} (<code>{update.effective_user.id}</code>):\n\n{msg}', parse_mode='HTML')
+        await context.bot.send_message(chat_id=ADMIN_ID, text=f'📨 پیام از {update.effective_user.full_name} (<code>{update.effective_user.id}</code>)\nID: {update.effective_user.username}\n\n{msg}', parse_mode='HTML')
         await update.message.reply_text('✅ پیامت برای مدیر فرستاده شد.')
 
     async def inline_query_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1106,7 +1106,7 @@ class Arz:
                 <h2>🚗 قیمت روز خودروهای {text}</h2>
                 <p><mark>🕒 زمان ثبت گزارش: {datetime.now(self.tehran).strftime('%H:%M:%S')}</mark></p>
 
-                <table bordered striped compact>
+                <table bordered striped compact sticky-headers>
                     <tr><th>🚘 خودرو</th><th>🏭 کارخانه</th><th>🏷️ بازار</th><th>📈 تغییر ۲۴ساعته</th><th>↔️ اختلاف</th></tr>
                     {message}
                 </table>
@@ -1154,13 +1154,13 @@ class Arz:
                 <h2>🚗 قیمت روز خودروهای {text}</h2>
                 <p><mark>🕒 زمان ثبت گزارش: {datetime.now(self.tehran).strftime('%H:%M:%S')}</mark></p>
 
-                <table bordered striped compact>
+                <table bordered striped compact sticky-headers>
                     <tr><th>🚘 خودرو</th><th>🏭 کارخانه</th><th>🏷️ بازار</th><th>📈 تغییر ۲۴ساعته</th><th>↔️ اختلاف</th></tr>
                     {message}
                 </table>
             """
 
-        elif text == '🧮 تبدیل ارز به ریال 🧮':
+        elif text == '🧮 مبدل ارز و طلا به ریال 🧮':
             await update.message.reply_text('🧮 مقدار و نام موردنظر را بفرست؛ مثلاً:\n<b>10 دلار</b>\n<b>25 یورو</b>\n<b>30 ریال عمان</b>\n<b>30 گرم طلا</b> یا <b>30 گرم</b>', 
                 parse_mode='HTML')
             return
@@ -1196,7 +1196,7 @@ class Arz:
                 time = datetime.now(self.tehran).strftime('%H:%M:%S | %Y/%m/%d')
 
                 await update.message.reply_text(
-                    f'\U0001f4b5 {amount_text} دلار = {int(toman):,} تومان\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
+                    f'\U0001f4b5 {amount_text} دلار = {int(toman):,} تومان\n\U0001f4b5 قیمت هر دلار: {int(dollar["sell_price"]["value"]):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
                 )
                 return
                 
@@ -1211,7 +1211,7 @@ class Arz:
                 time = datetime.now(self.tehran).strftime('%H:%M:%S | %Y/%m/%d')
 
                 await update.message.reply_text(
-                    f'💷 {amount_text} یورو = {int(toman):,} تومان\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
+                    f'💷 {amount_text} یورو = {int(toman):,} تومان\n💷 قیمت هر یورو: {int(eurro["sell_price"]["value"]):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
                 )
                 return
 
@@ -1226,7 +1226,7 @@ class Arz:
                 time = datetime.now(self.tehran).strftime('%H:%M:%S | %Y/%m/%d')
 
                 await update.message.reply_text(
-                    f'💰 {amount_text} گرم طلا = {int(toman):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
+                    f'💰 {amount_text} گرم طلا = {int(toman):,}\n💰 قیمت هر گرم طلا: {int(tala):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
                 )
                 return
 
@@ -1241,7 +1241,7 @@ class Arz:
                 time = datetime.now(self.tehran).strftime('%H:%M:%S | %Y/%m/%d')
 
                 await update.message.reply_text(
-                    f'🇴🇲 {amount_text} ریال عمان = {int(toman):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
+                    f'🇴🇲 {amount_text} ریال عمان = {int(toman):,}\n🇴🇲 قیمت هر ریال عمان: {int(oman["sell_price"]["value"]):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
                 )
                 return
             
@@ -1353,7 +1353,7 @@ if __name__ == '__main__':
     application.post_init = post_init
 
     button_text = ['💱 خلاصه قیمت ها 🪙', '🪙 قیمت سکه 🪙', '💰 قیمت طلا 💰', '💱 قیمت ارز ها 💱', 
-        '🚗 خودرو های وارداتی 🚗', '🚗 خودرو های داخلی 🚗', '🧮 تبدیل ارز به ریال 🧮', 'هیوندای',
+        '🚗 خودرو های وارداتی 🚗', '🚗 خودرو های داخلی 🚗', '🧮 مبدل ارز و طلا به ریال 🧮', 'هیوندای',
         'کیا', 'تویوتا', 'بنز', 'بی ام و', 'فولکس واگن', 'مزدا', 'ولوو', 'آئودی', 'نیسان', 'هوندا', 'میتسوبیشی',
         'MG', 'BYD', 'GAC', 'چانگان', 'ونوسیا', 'اشکودا', 'سایپا', 'ایران خودرو', 'سایر', 'بهمن موتور', 'مدیران خودرو', 'کرمان موتور', '🔙 بازگشت'
     ]
