@@ -20,7 +20,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.7.4'
+VERSION = '4.7.5'
 
 class Arz:
     def __init__(self):
@@ -290,7 +290,7 @@ class Arz:
         await self.reaction(update, context)
 
         html = f"""
-            <h1>v{VERSION} ✨</h1>
+            <h1 style="text-align: left;">v{VERSION} ✨</h1>
 
             <h2>✨ تغییرات این نسخه</h2>
             <p>دستیار قدرتمند هوش مصنوعی <b>Google Gemini</b> به ربات اضافه شد!.🚀</p>
@@ -854,15 +854,15 @@ class Arz:
 
             <table bordered striped compact>
                 <tr><th>عنوان</th><th>💵 نرخ فروش</th><th>⬆️ بیشینه</th><th>⬇️ کمینه</th><th>🫧 حباب</th></tr>
-                <tr><td>\U0001f4b8 تتر</td><td>{int(tether['price_toman']):,}</td><td>{tether_max:,}</td><td>{tether_min:,}</td><td>---</td></tr>
-                <tr><td>\U0001f4b5 دلار</td><td>{int(dollar['sell_price']['value']):,}</td><td>{usd_max:,}</td><td>{usd_min:,}</td><td>---</td></tr>
-                <tr><td>💷 یورو</td><td>{int(eurro['sell_price']['value']):,}</td><td>{eur_max:,}</td><td>{eur_min:,}</td><td>---</td></tr>
-                <tr><td>🪙 سکه امامی</td><td>{int(seke_emami['price']):,}</td><td>{emami_max:,}</td><td>{emami_min:,}</td><td>{int(seke_emami['bubble']['amount']):,}</td></tr>
-                <tr><td>🪙 سکه بهار آزادی</td><td>{int(seke['price']):,}</td><td>{azadi_max:,}</td><td>{azadi_min:,}</td><td>{int(seke['bubble']['amount']):,}</td></tr>
-                <tr><td>💰 طلای 18 عیار</td><td>{int(tala_18['price']):,}</td><td>{tala_max:,}</td><td>{tala_min:,}</td><td>{int(tala_18['bubble']['amount']):,}</td></tr>
-                <tr><td>🥇 انس طلا</td><td>{gold_global['price']}</td><td>{global_max}</td><td>{global_min}</td><td>null</td></tr>
-                <tr><td>🥈 انس نقره</td><td>{silver['price']}</td><td>{silver_max}</td><td>{silver_min}</td><td align="center">null</td></tr>
-                <tr><td>🛢️ {oil['name']}</td><td>{oil['price']} دلار</td><td>{oil_max}</td><td>{oil_min}</td><td>null</td></tr>
+                <tr align="center"><td>\U0001f4b8 تتر</td><td>{int(tether['price_toman']):,}</td><td>{tether_max:,}</td><td>{tether_min:,}</td><td>null</td></tr>
+                <tr align="center"><td>\U0001f4b5 دلار</td><td>{int(dollar['sell_price']['value']):,}</td><td>{usd_max:,}</td><td>{usd_min:,}</td><td>null</td></tr>
+                <tr align="center"><td>💷 یورو</td><td>{int(eurro['sell_price']['value']):,}</td><td>{eur_max:,}</td><td>{eur_min:,}</td><td>null</td></tr>
+                <tr align="center"><td>🪙 سکه امامی</td><td>{int(seke_emami['price']):,}</td><td>{emami_max:,}</td><td>{emami_min:,}</td><td>{int(seke_emami['bubble']['amount']):,}</td></tr>
+                <tr align="center"><td>🪙 سکه بهار آزادی</td><td>{int(seke['price']):,}</td><td>{azadi_max:,}</td><td>{azadi_min:,}</td><td>{int(seke['bubble']['amount']):,}</td></tr>
+                <tr align="center"><td>💰 طلای 18 عیار</td><td>{int(tala_18['price']):,}</td><td>{tala_max:,}</td><td>{tala_min:,}</td><td>{int(tala_18['bubble']['amount']):,}</ td >
+                <tr align="center"><td>🥇 انس طلا</td><td>{gold_global['price']}</td><td>{global_max}</td><td>{global_min}</td><td>null</td></tr>
+                <tr align="center"><td>🥈 انس نقره</td><td>{silver['price']}</td><td>{silver_max}</td><td>{silver_min}</td><td>null</td></tr>
+                <tr align="center"><td>🛢️ {oil['name']}</td><td>{oil['price']} دلار</td><td>{oil_max}</td><td>{oil_min}</td><td>null</td></tr>
             </table>
         """
 
@@ -948,15 +948,15 @@ class Arz:
 
                 <table bordered striped compact>
                     <tr><th>نماد</th><th>💱 ارز</th><th>\U0001f4b0 نرخ فروش</th><th>💵 نسبت به دلار</tr>
-                    <tr><td>🇺🇸</td><td>دلار آمریکا</td><td>{int(dollar['sell_price']['value']):,}</td><td>---</td></tr>
-                    <tr><td>🇪🇺</td><td>یورو اروپا</td><td>{int(eurro['sell_price']['value']):,}</td><td>{eur_rate}</td></tr>
-                    <tr><td>🇨🇦</td><td>دلار کانادا</td><td>{int(canada['sell_price']['value']):,}</td><td>{can_rate}</td></tr>
-                    <tr><td>🇦🇪</td><td>درهم امارات</td><td>{int(derham['sell_price']['value']):,}</td><td>{der_rate}</td></tr>
-                    <tr><td>🇹🇷</td><td>لیر ترکیه</td><td>{int(lir['sell_price']['value']):,}</td><td>{lir_rate}</td></tr>
-                    <tr><td>🇬🇧</td><td>پوند انگلیس</td><td>{int(pond['sell_price']['value']):,}</td><td>{pond_rate}</td></tr>
-                    <tr><td>🇮🇶</td><td>صد دینار عراق</td><td>{int(dinar['sell_price']['value']):,}</td><td>{dinar_rate}</td></tr>
-                    <tr><td>🇴🇲</td><td>ریال عمان</td><td>{int(oman['sell_price']['value']):,}</td><td>{oman_rate}</td></tr>
-                    <tr><td>🇸🇦</td><td>ریال عربستان</td><td>{int(arab['sell_price']['value']):,}</td><td>{arab_rate}</td></tr>
+                    <tr align="center"><td>🇺🇸</td><td>دلار آمریکا</td><td>{int(dollar['sell_price']['value']):,}</td><td>null</td></tr>
+                    <tr align="center"><td>🇪🇺</td><td>یورو اروپا</td><td>{int(eurro['sell_price']['value']):,}</td><td>{eur_rate}</td></tr>
+                    <tr align="center"><td>🇨🇦</td><td>دلار کانادا</td><td>{int(canada['sell_price']['value']):,}</td><td>{can_rate}</td></tr>
+                    <tr align="center"><td>🇦🇪</td><td>درهم امارات</td><td>{int(derham['sell_price']['value']):,}</td><td>{der_rate}</td></tr>
+                    <tr align="center"><td>🇹🇷</td><td>لیر ترکیه</td><td>{int(lir['sell_price']['value']):,}</td><td>{lir_rate}</td></tr>
+                    <tr align="center"><td>🇬🇧</td><td>پوند انگلیس</td><td>{int(pond['sell_price']['value']):,}</td><td>{pond_rate}</td></tr>
+                    <tr align="center"><td>🇮🇶</td><td>صد دینار عراق</td><td>{int(dinar['sell_price']['value']):,}</td><td>{dinar_rate}</td></tr>
+                    <tr align="center"><td>🇴🇲</td><td>ریال عمان</td><td>{int(oman['sell_price']['value']):,}</td><td>{oman_rate}</td></tr>
+                    <tr align="center"><td>🇸🇦</td><td>ریال عربستان</td><td>{int(arab['sell_price']['value']):,}</td><td>{arab_rate}</td></tr>
                 </table>
             """
             
@@ -1016,10 +1016,10 @@ class Arz:
 
                 <table bordered striped compact>
                     <tr><th>نوع سکه</th><th>💵 قیمت فعلی</th><th>⬆️ بیشینه</th><th>⬇️ کمینه</th><th>🫧 حباب</th></tr>
-                    <tr><td>🪙 سکه امامی</td><td>{int(emami['price']):,}</td><td>{max_emami:,}</td><td>{min_emami:,}</td><td>{int(emami['bubble']['amount']):,}</td></tr>
-                    <tr><td>🪙 سکه بهار آزادی</td><td>{int(azadi['price']):,}</td><td>{max_azadi:,}</td><td>{min_azadi:,}</td><td>{int(azadi['bubble']['amount']):,}</td></tr>
-                    <tr><td>🪙 نیم سکه</td><td>{int(nim['price']):,}</td><td>{max_nim:,}</td><td>{min_nim:,}</td><td>{int(nim['bubble']['amount']):,}</td></tr>
-                    <tr><td>🪙 ربع سکه</td><td>{int(rob['price']):,}</td><td>{max_rob:,}</td><td>{min_rob:,}</td><td>{int(rob['bubble']['amount']):,}</td></tr>
+                    <tr align="center"><td>🪙 سکه امامی</td><td>{int(emami['price']):,}</td><td>{max_emami:,}</td><td>{min_emami:,}</td><td>{int(emami['bubble']['amount']):,}</td></tr>
+                    <tr align="center"><td>🪙 سکه بهار آزادی</td><td>{int(azadi['price']):,}</td><td>{max_azadi:,}</td><td>{min_azadi:,}</td><td>{int(azadi['bubble']['amount']):,}</td></tr>
+                    <tr align="center"><td>🪙 نیم سکه</td><td>{int(nim['price']):,}</td><td>{max_nim:,}</td><td>{min_nim:,}</td><td>{int(nim['bubble']['amount']):,}</td></tr>
+                    <tr align="center"><td>🪙 ربع سکه</td><td>{int(rob['price']):,}</td><td>{max_rob:,}</td><td>{min_rob:,}</td><td>{int(rob['bubble']['amount']):,}</td></tr>
                 </table>
             """
 
@@ -1055,9 +1055,9 @@ class Arz:
 
                 <table bordered compact>
                     <tr><th>شاخص</th><th>💵 مقدار</th><th>⬆️ بیشینه</th><th>⬇️ کمینه</th><th>🫧 حباب</th></tr>
-                    <tr><td>💰 طلای 18 عیار</td><td>{int(tala_18['price']):,}</td><td>{max_price:,}</td><td>{min_price:,}</td><td>{int(tala_18['bubble']['amount']):,}</td></tr>
-                    <tr><td>🥇 انس طلا</td><td>{gold_global['price']}</td><td>null</td><td>null</td><td>null</td></tr>
-                    <tr><td>🥈 انس نقره</td><td>{silver['price']}</td><td>null</td><td>null</td><td>null</td></tr>
+                    <tr align="center"><td>💰 طلای 18 عیار</td><td>{int(tala_18['price']):,}</td><td>{max_price:,}</td><td>{min_price:,}</td><td>{int(tala_18['bubble']['amount']):,}</td></tr>
+                    <tr align="center"><td>🥇 انس طلا</td><td>{gold_global['price']}</td><td>null</td><td>null</td><td>null</td></tr>
+                    <tr align="center"><td>🥈 انس نقره</td><td>{silver['price']}</td><td>null</td><td>null</td><td>null</td></tr>
                 </table>
             """
 
