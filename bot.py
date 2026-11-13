@@ -859,10 +859,10 @@ class Arz:
                 <tr align="center"><td>💷 یورو</td><td>{int(eurro['sell_price']['value']):,}</td><td>{eur_max:,}</td><td>{eur_min:,}</td><td>null</td></tr>
                 <tr align="center"><td>🪙 سکه امامی</td><td>{int(seke_emami['price']):,}</td><td>{emami_max:,}</td><td>{emami_min:,}</td><td>{int(seke_emami['bubble']['amount']):,}</td></tr>
                 <tr align="center"><td>🪙 سکه بهار آزادی</td><td>{int(seke['price']):,}</td><td>{azadi_max:,}</td><td>{azadi_min:,}</td><td>{int(seke['bubble']['amount']):,}</td></tr>
-                <tr align="center"><td>💰 طلای 18 عیار</td><td>{int(tala_18['price']):,}</td><td>{tala_max:,}</td><td>{tala_min:,}</td><td>{int(tala_18['bubble']['amount']):,}</ td >
+                <tr align="center"><td>💰 طلای 18 عیار</td><td>{int(tala_18['price']):,}</td><td>{tala_max:,}</td><td>{tala_min:,}</td><td>{int(tala_18['bubble']['amount']):,}</td></tr>
                 <tr align="center"><td>🥇 انس طلا</td><td>{gold_global['price']}</td><td>{global_max}</td><td>{global_min}</td><td>null</td></tr>
                 <tr align="center"><td>🥈 انس نقره</td><td>{silver['price']}</td><td>{silver_max}</td><td>{silver_min}</td><td>null</td></tr>
-                <tr align="center"><td>🛢️ {oil['name']}</td><td>{oil['price']} دلار</td><td>{oil_max}</td><td>{oil_min}</td><td>null</td></tr>
+                <tr align="center"><td>🛢️ {oil['name']}</td><td>{oil['price']}</td><td>{oil_max}</td><td>{oil_min}</td><td>null</td></tr>
             </table>
         """
 
@@ -870,6 +870,11 @@ class Arz:
             self.upload_data(self.data, 'prices')
 
         if context.job is not None:
+            html += """
+                <tg-button-row>
+                    <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
+                </tg-button-row>
+            """
             await self.send_rich_message(context.job.chat_id, html)
             return
         
@@ -1184,6 +1189,11 @@ class Arz:
                 parse_mode='HTML')
             return
 
+        html += """
+            <tg-button-row>
+                <tg-button type="url" style="success" url="https://t.me/arzpricekshbot">ورود به ربات</tg-button>
+            </tg-button-row>
+        """
         await sent.delete()
         await self.send_rich_message(update.effective_chat.id, html)
         return
