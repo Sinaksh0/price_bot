@@ -35,7 +35,7 @@ class Arz:
             ['🪙 قیمت سکه 🪙', '💰 قیمت طلا 💰'],
             ['💱 قیمت ارز ها 💱'],
             ['🚗 خودرو های وارداتی 🚗', '🚗 خودرو های داخلی 🚗'],
-            ['🔎 Inline Mode | جستجو سریع 🔎','🧮 مبدل ارز و طلا به تومان 🧮']
+            ['🔎 جستجو سریع در چت 🔎','🧮 مبدل ارز و طلا به تومان 🧮']
         ]
 
         self.admin_keyborad = [
@@ -43,7 +43,7 @@ class Arz:
             ['🪙 قیمت سکه 🪙', '💰 قیمت طلا 💰'],
             ['💱 قیمت ارز ها 💱'],
             ['🚗 خودرو های وارداتی 🚗', '🚗 خودرو های داخلی 🚗'],
-            ['🔎 Inline Mode | جستجو سریع 🔎', '🧮 مبدل ارز و طلا به تومان 🧮'],
+            ['🔎 جستجو سریع در چت 🔎', '🧮 مبدل ارز و طلا به تومان 🧮'],
             ['⚙️ پنل مدیریت ⚙️']
         ]
 
@@ -1191,7 +1191,7 @@ class Arz:
             """
 
         elif text == '🧮 مبدل ارز و طلا به تومان 🧮':
-            await update.message.reply_text('🧮 مقدار و نام موردنظر را بفرست؛ مثلاً:\n<b>10 دلار</b>\n<b>25 یورو</b>\n<b>30 ریال عمان</b>\n<b>30 گرم طلا</b> یا <b>30 گرم</b>', 
+            await update.message.reply_text('🧮 مقدار و نام موردنظر را بفرست؛ مثلاً:\n<b>10 دلار</b>\n<b>25 یورو</b>\n<b>30 ریال عمان</b>\n<b>30 گرم طلا</b> یا <b>50.25 گرم</b> یا <b>20.5 طلا</b>', 
                 parse_mode='HTML')
             return
 
@@ -1296,13 +1296,13 @@ class Arz:
                 f"تو مشاور مالی ربات قیمت‌نما هستی.\n"
                 f"نام کاربر: {name_user}\n"
                 "قابلیت‌های ربات و راهنمای استفاده:\n"
-                "1. گزارش خودکار قیمت: کاربر با دستور /set ساعت‌ها را به وقت تهران تنظیم می‌کند؛ "
+                "1. گزارش خودکار قیمت: کاربر با دستور /set هر تعداد ساعت‌ را به وقت تهران تنظیم می‌کند؛ "
                 "مثال: /set 8:15 10:35 18 22. گزارش در همان گفتگو ارسال می‌شود. "
                 "برای دیدن ساعت‌های ثبت‌شده /myschedule و برای لغو گزارش خودکار همان گفتگو /unset را بفرستد.\n"
                 "2. Inline Mode: کاربر در هر چت عبارت @arzpricekshbot را همراه کلیدواژه‌ای مثل دلار، تتر، یورو، طلا یا سکه وارد می‌کند "
                 "و نتیجه را برای اشتراک‌گذاری انتخاب می‌کند. بدون کلیدواژه، همه گزینه‌ها نمایش داده می‌شوند.\n"
                 "3. مبدل ارز و طلا: کاربر دکمه «🧮 مبدل ارز و طلا به ریال 🧮» را می‌زند و سپس مقدار و مورد را می‌فرستد؛ "
-                "نمونه‌های پشتیبانی‌شده: 10 دلار، 25 یورو، 30 ریال عمان، 30 گرم طلا یا 30 گرم. "
+                "نمونه‌های پشتیبانی‌شده: 10 دلار، 25 یورو، 30 ریال عمان، 30 گرم طلا یا 50.25 گرم یا 20.5 طلا. "
                 "محاسبه با نرخ دریافتی از API انجام می‌شود و نتیجه به تومان است.\n"
                 "اگر کاربر درباره این قابلیت‌ها سؤال کرد، فقط همین رفتار و دستورهای واقعی را توضیح بده. "
                 "ادعا نکن که خودت می‌توانی زمان‌بندی را تنظیم یا لغو کنی؛ کاربر باید دستور مربوط را اجرا کند.\n"
@@ -1413,10 +1413,10 @@ if __name__ == '__main__':
     application.add_handler(CommandHandler("help", arz.help))
     application.add_handler(InlineQueryHandler(arz.inline_query_handler))
     application.add_handler(MessageHandler(filters.Regex(pattern), arz.take_price))
-    application.add_handler(MessageHandler(filters.Regex(r'^🔎 Inline Mode \| جستجو سریع 🔎$'), arz.inlinemode))
+    application.add_handler(MessageHandler(filters.Regex(r'^🔎 جستجو سریع در چت 🔎$'), arz.inlinemode))
     application.add_handler(MessageHandler(filters.Regex(r'^⚙️ پنل مدیریت ⚙️$'), arz.admin_panel))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, arz.genai_handler, block=False))
     application.add_handler(CallbackQueryHandler(arz.handle_panel))
-    #application.job_queue.run_once(arz.check_update, when=5)
+    application.job_queue.run_once(arz.check_update, when=5)
 
     application.run_polling()
