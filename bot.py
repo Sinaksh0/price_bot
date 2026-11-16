@@ -20,7 +20,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.7.7'
+VERSION = '4.8.0'
 
 class Arz:
     def __init__(self):
@@ -35,7 +35,7 @@ class Arz:
             ['🪙 قیمت سکه 🪙', '💰 قیمت طلا 💰'],
             ['💱 قیمت ارز ها 💱'],
             ['🚗 خودرو های وارداتی 🚗', '🚗 خودرو های داخلی 🚗'],
-            ['🔎 Inline Mode | جستجو سریع در چت 🔎','🧮 مبدل ارز و طلا به تومان 🧮']
+            ['🔎 Inline Mode | جستجو سریع 🔎','🧮 مبدل ارز و طلا به تومان 🧮']
         ]
 
         self.admin_keyborad = [
@@ -43,7 +43,7 @@ class Arz:
             ['🪙 قیمت سکه 🪙', '💰 قیمت طلا 💰'],
             ['💱 قیمت ارز ها 💱'],
             ['🚗 خودرو های وارداتی 🚗', '🚗 خودرو های داخلی 🚗'],
-            ['🔎 Inline Mode | جستجو سریع در چت 🔎', '🧮 مبدل ارز و طلا به تومان 🧮'],
+            ['🔎 Inline Mode | جستجو سریع 🔎', '🧮 مبدل ارز و طلا به تومان 🧮'],
             ['⚙️ پنل مدیریت ⚙️']
         ]
 
@@ -290,14 +290,14 @@ class Arz:
         await self.reaction(update, context)
 
         html = f"""
-            <h1>🆕 معرفی امکانات قیمت‌نما | نسخه v{VERSION}</h1>
+            <h1>🆕 نسخه: v{VERSION}</h1>
 
             <h2>🔎 جست‌وجو و اشتراک قیمت با Inline Mode</h2>
             <p>دکمه «🔎 Inline Mode» رو بزن. می‌تونی جست‌وجو رو در همین گفتگو انجام بدی یا چت دیگری رو برای اشتراک نتیجه انتخاب کنی؛ بعد نامی مثل «دلار»، «طلا» یا «سکه» رو جست‌وجو و نتیجهٔ دلخواه رو انتخاب کن.</p>
 
-            <h3>🚀 اکنون <b>Google Gemini</b> به آپشن های ربات مسلط است و تاریخچه هر کاربر را فراموش نمی‌کند.</b>
+            <p>🚀 اکنون <b>Google Gemini</b> به آپشن های ربات مسلط است و تاریخچه هر کاربر را فراموش نمی‌کند.</p>
 
-            <p>📋 برای توضیحات بیشتر، <code>/options</code> رو بفرست. از دکمه‌های منو هم می‌تونی شروع کنی. 🌟</p>
+            <p>📋 برای توضیحات بیشتر، /options رو بفرست. از دکمه‌های منو هم می‌تونی شروع کنی. 🌟</p>
         """
 
         await self.send_rich_message(chat_id, html, reply_markup)
@@ -751,15 +751,14 @@ class Arz:
 
     async def inlinemode(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [
-            [InlineKeyboardButton("🔎 جستجو خلاصه قیمت با دوستان 🔎", switch_inline_query=""),
-            InlineKeyboardButton("🔎 جستجو قیمت ها در چت فعلی 🔎", switch_inline_query_current_chat="")
-            ]
+            [InlineKeyboardButton("🔎 جستجو سریع با دوستان 🔎", switch_inline_query="")],
+            [InlineKeyboardButton("🔎 جستجو سریع در چت فعلی 🔎", switch_inline_query_current_chat="")]
         ]
 
         markup = InlineKeyboardMarkup(keyboard).to_dict()
 
         html = """
-            <h3>🔎 قیمت‌ها رو راحت جست‌وجو و به اشتراک بذار!</h3>
+            <h1>🔎 قیمت‌ها رو راحت جست‌وجو و به اشتراک بذار!</h1>
             <p>یکی از گزینه‌های زیر رو انتخاب کن و قیمت موردنظرت رو برای خودت یا دوستات بفرست:</p>
             <p>👥 <b>با دوستان:</b> چت دلخواهت رو انتخاب کن، بعد مثلاً «دلار»، «طلا» یا «سکه» رو جست‌وجو کن.</p>
             <p>💬 <b>در چت فعلی:</b> بدون خروج از این گفتگو جست‌وجو کن و نتیجه رو همین‌جا بفرست.</p>
@@ -1414,7 +1413,7 @@ if __name__ == '__main__':
     application.add_handler(CommandHandler("help", arz.help))
     application.add_handler(InlineQueryHandler(arz.inline_query_handler))
     application.add_handler(MessageHandler(filters.Regex(pattern), arz.take_price))
-    application.add_handler(MessageHandler(filters.Regex(r'^🔎 Inline Mode \| جستجو سریع در چت 🔎$'), arz.inlinemode))
+    application.add_handler(MessageHandler(filters.Regex(r'^🔎 Inline Mode \| جستجو سریع 🔎$'), arz.inlinemode))
     application.add_handler(MessageHandler(filters.Regex(r'^⚙️ پنل مدیریت ⚙️$'), arz.admin_panel))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, arz.genai_handler, block=False))
     application.add_handler(CallbackQueryHandler(arz.handle_panel))
