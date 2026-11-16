@@ -20,7 +20,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.7.5'
+VERSION = '4.7.7'
 
 class Arz:
     def __init__(self):
@@ -35,7 +35,7 @@ class Arz:
             ['🪙 قیمت سکه 🪙', '💰 قیمت طلا 💰'],
             ['💱 قیمت ارز ها 💱'],
             ['🚗 خودرو های وارداتی 🚗', '🚗 خودرو های داخلی 🚗'],
-            ['🧮 مبدل ارز و طلا به ریال 🧮']
+            ['🔎 Inline Mode | جستجو سریع در چت 🔎','🧮 مبدل ارز و طلا به تومان 🧮']
         ]
 
         self.admin_keyborad = [
@@ -43,7 +43,7 @@ class Arz:
             ['🪙 قیمت سکه 🪙', '💰 قیمت طلا 💰'],
             ['💱 قیمت ارز ها 💱'],
             ['🚗 خودرو های وارداتی 🚗', '🚗 خودرو های داخلی 🚗'],
-            ['🧮 مبدل ارز و طلا به ریال 🧮'],
+            ['🔎 Inline Mode | جستجو سریع در چت 🔎', '🧮 مبدل ارز و طلا به تومان 🧮'],
             ['⚙️ پنل مدیریت ⚙️']
         ]
 
@@ -256,7 +256,7 @@ class Arz:
             </ul>
 
             <h3>⚡ جست‌وجوی سریع در هر چت</h3>
-            <p>بنویس <code>@arzpricekshbot</code> و بعد نام مورد نظرت رو جست‌وجو کن؛ مثلاً <code>@arzpricekshbot دلار</code>. برای دیدن همه گزینه‌ها، فقط آیدی ربات رو وارد کن.</p>
+            <p>دکمه Inline Mode را بزن تا جستجو را راهنمایی کنم. یا در هر چت ایدی ربات: <code>@arzpricekshbot</code> را در هر چت (حتی شخصی) بنویس تا جستجو شروع شود.</p>
 
             <p>👇 از دکمه‌های منو شروع کن یا برای دیدن راهنمای کامل، /options رو بفرست.</p>
 
@@ -290,17 +290,14 @@ class Arz:
         await self.reaction(update, context)
 
         html = f"""
-            <h1 style="text-align: left;">v{VERSION} ✨</h1>
+            <h1>🆕 معرفی امکانات قیمت‌نما | نسخه v{VERSION}</h1>
 
-            <h2>✨ تغییرات این نسخه</h2>
-            <p>دستیار قدرتمند هوش مصنوعی <b>Google Gemini</b> به ربات اضافه شد!.🚀</p>
+            <h2>🔎 جست‌وجو و اشتراک قیمت با Inline Mode</h2>
+            <p>دکمه «🔎 Inline Mode» رو بزن. می‌تونی جست‌وجو رو در همین گفتگو انجام بدی یا چت دیگری رو برای اشتراک نتیجه انتخاب کنی؛ بعد نامی مثل «دلار»، «طلا» یا «سکه» رو جست‌وجو و نتیجهٔ دلخواه رو انتخاب کن.</p>
 
-            <p>از این به بعد، ربات ما فقط یک استعلام‌گیرنده‌ی قیمت نیست؛ بلکه به یک مشاور و تحلیلگر هوشمند تبدیل شده است. 💬 هر سوالی در مورد بازار، اقتصاد، تحلیل قیمت‌ها یا حتی موضوعات متفرقه داری، کافیه مستقیماً برای ربات بفرستی تا در چند ثانیه کامل‌ترین پاسخ رو بهت بده! همین حالا امتحان کن و سوالت رو بفرست... 👇🤖</p>
+            <h3>🚀 اکنون <b>Google Gemini</b> به آپشن های ربات مسلط است و تاریخچه هر کاربر را فراموش نمی‌کند.</b>
 
-
-            <ul>
-                <li><input type="checkbox" checked><strong>تغییرات جدید با موفقیت انجام شد</strong></li>
-            </ul>
+            <p>📋 برای توضیحات بیشتر، <code>/options</code> رو بفرست. از دکمه‌های منو هم می‌تونی شروع کنی. 🌟</p>
         """
 
         await self.send_rich_message(chat_id, html, reply_markup)
@@ -343,11 +340,10 @@ class Arz:
                 <tr><td>🚗 خودروهای داخلی 🚗</td><td>استعلام قیمت کارخانه و بازار محصولات سایپا، ایران‌خودرو، مدیران‌خودرو، کرمان‌موتور و بهمن‌موتور.</td></tr>
                 <tr><td>🚙 خودروهای وارداتی  وارداتی</td><td>مشاهده قیمت روز خودروهای خارجی و برندهای جهانی (تویوتا، بنز، بی‌آم‌و، هیوندای، کیا و...).</td></tr>
                 <tr><td>🧮 تبدیل ارز به ریال 🧮</td><td>قابلیت هوشمند محاسبه و تبدیل مقادیر دلخواه (مثلاً: <code>10 دلار</code>، <code>25 یورو</code> یا <code>30 گرم طلا</code>) به تومان.</td></tr>
+                <tr><td>🔎 جستجو سریع در چت با دوستان 🔎</td><td>دکمه <b>Inline Mode</b> را بزن و جستجو قیمت را انجام بده.</td></tr>
                 <tr><td>🤖 هوش مصنوعی Gemini</td><td>ارسال هرگونه سوال متفرقه، تحلیل اقتصادی یا مشاوره مالی به صورت متنی و دریافت پاسخ دقیق در چند ثانیه.</td></tr>
                 <tr><td>⏰ گزارش‌های خودکار (/set)</td><td>تنظیم ساعت‌های مشخص در روز برای دریافت خودکار خلاصه وضعیت بازار در چت یا گروه.</td></tr>
             </table>
-
-            <p>💡 <b>جستجوی سریع (Inline):</b> در هر چتی با نوشتن نام ربات و کلیدواژه (مثل <code>@arzpricekshbot دلار</code>) می‌توانید قیمت‌ها را به صورت اینلاین به اشتراک بگذارید.</p>
 
             <tg-button-row>
                 <tg-button type="url" style="success" url="https://t.me/SI_KSH">پشتیبانی ربات</tg-button>
@@ -753,6 +749,25 @@ class Arz:
 
         await update.inline_query.answer(query_list, cache_time=1)
 
+    async def inlinemode(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        keyboard = [
+            [InlineKeyboardButton("🔎 جستجو خلاصه قیمت با دوستان 🔎", switch_inline_query=""),
+            InlineKeyboardButton("🔎 جستجو قیمت ها در چت فعلی 🔎", switch_inline_query_current_chat="")
+            ]
+        ]
+
+        markup = InlineKeyboardMarkup(keyboard).to_dict()
+
+        html = """
+            <h3>🔎 قیمت‌ها رو راحت جست‌وجو و به اشتراک بذار!</h3>
+            <p>یکی از گزینه‌های زیر رو انتخاب کن و قیمت موردنظرت رو برای خودت یا دوستات بفرست:</p>
+            <p>👥 <b>با دوستان:</b> چت دلخواهت رو انتخاب کن، بعد مثلاً «دلار»، «طلا» یا «سکه» رو جست‌وجو کن.</p>
+            <p>💬 <b>در چت فعلی:</b> بدون خروج از این گفتگو جست‌وجو کن و نتیجه رو همین‌جا بفرست.</p>
+            <p>✨ بعد از انتخاب نتیجه، قیمت به‌صورت پیام در چت قرار می‌گیره.</p>
+        """
+        await self.send_rich_message(update.effective_chat.id, html, markup)
+        return
+    
     async def send_daily(self, context: ContextTypes.DEFAULT_TYPE):
         self.data = self.load_price()
         data = await self.get_arz(MAIN_API)
@@ -768,7 +783,6 @@ class Arz:
         tala_data = self.data['gold'] if self.data['date'] == today else []
         global_data = self.data.get('global_gold', []) if self.data['date'] == today else []
         silver_data = self.data.get('silver', []) if self.data['date'] == today else []
-        oil_data = self.data.get('oil', []) if self.data['date'] == today else []
 
         if self.data.get('date') != today:
             self.data['date'] = today
@@ -824,11 +838,6 @@ class Arz:
             self.data['silver'] = silver_data
             flag = True
 
-        if oil['price'] not in oil_data:
-            oil_data.append(oil['price'])
-            self.data['oil'] = oil_data
-            flag = True
-
         tether_max = max(tether_data)
         tether_min = min(tether_data)
         usd_max = max(usd_data)
@@ -845,8 +854,6 @@ class Arz:
         global_min = min(global_data)
         silver_max = max(silver_data)
         silver_min = min(silver_data)
-        oil_max = max(oil_data)
-        oil_min = min(oil_data)
 
         html = f"""
             <h3>💱 گزارش خلاصه بازار 🪙</h3>
@@ -862,7 +869,7 @@ class Arz:
                 <tr align="center"><td>💰 طلای 18 عیار</td><td>{int(tala_18['price']):,}</td><td>{tala_max:,}</td><td>{tala_min:,}</td><td>{int(tala_18['bubble']['amount']):,}</td></tr>
                 <tr align="center"><td>🥇 انس طلا</td><td>{gold_global['price']}</td><td>{global_max}</td><td>{global_min}</td><td>null</td></tr>
                 <tr align="center"><td>🥈 انس نقره</td><td>{silver['price']}</td><td>{silver_max}</td><td>{silver_min}</td><td>null</td></tr>
-                <tr align="center"><td>🛢️ {oil['name']}</td><td>{oil['price']}</td><td>{oil_max}</td><td>{oil_min}</td><td>null</td></tr>
+                <tr align="center"><td>🛢️ {oil['name']}</td><td>{oil['price']}</td><td>{oil['high']}</td><td>{oil['low']}</td><td>null</td></tr>
             </table>
         """
 
@@ -1184,7 +1191,7 @@ class Arz:
                 </table>
             """
 
-        elif text == '🧮 مبدل ارز و طلا به ریال 🧮':
+        elif text == '🧮 مبدل ارز و طلا به تومان 🧮':
             await update.message.reply_text('🧮 مقدار و نام موردنظر را بفرست؛ مثلاً:\n<b>10 دلار</b>\n<b>25 یورو</b>\n<b>30 ریال عمان</b>\n<b>30 گرم طلا</b> یا <b>30 گرم</b>', 
                 parse_mode='HTML')
             return
@@ -1220,7 +1227,7 @@ class Arz:
                 time = datetime.now(self.tehran).strftime('%H:%M:%S | %Y/%m/%d')
 
                 await update.message.reply_text(
-                    f'\U0001f4b5 {amount_text} دلار = {int(toman):,} تومان\n\U0001f4b5 قیمت هر دلار: {int(dollar["sell_price"]["value"]):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
+                    f'\U0001f4b5 <b>{amount_text} دلار</b> = {int(toman):,} تومان\n\U0001f4b5 <b>قیمت هر دلار:</b> {int(dollar["sell_price"]["value"]):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
                 )
                 return
                 
@@ -1235,7 +1242,7 @@ class Arz:
                 time = datetime.now(self.tehran).strftime('%H:%M:%S | %Y/%m/%d')
 
                 await update.message.reply_text(
-                    f'💷 {amount_text} یورو = {int(toman):,} تومان\n💷 قیمت هر یورو: {int(eurro["sell_price"]["value"]):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
+                    f'💷 <b>{amount_text} یورو</b> = {int(toman):,} تومان\n💷 <b>قیمت هر یورو:</b> {int(eurro["sell_price"]["value"]):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
                 )
                 return
 
@@ -1250,7 +1257,7 @@ class Arz:
                 time = datetime.now(self.tehran).strftime('%H:%M:%S | %Y/%m/%d')
 
                 await update.message.reply_text(
-                    f'💰 {amount_text} گرم طلا = {int(toman):,}\n💰 قیمت هر گرم طلا: {int(tala):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
+                    f'💰 <b>{amount_text} گرم طلا</b> = {int(toman):,}\n💰 <b>قیمت هر گرم طلا:</b> {int(tala):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
                 )
                 return
 
@@ -1265,7 +1272,7 @@ class Arz:
                 time = datetime.now(self.tehran).strftime('%H:%M:%S | %Y/%m/%d')
 
                 await update.message.reply_text(
-                    f'🇴🇲 {amount_text} ریال عمان = {int(toman):,}\n🇴🇲 قیمت هر ریال عمان: {int(oman["sell_price"]["value"]):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
+                    f'🇴🇲 <b>{amount_text} ریال عمان</b> = {int(toman):,}\n🇴🇲 <b>قیمت هر ریال عمان:</b> {int(oman["sell_price"]["value"]):,}\n\n🕒 <b>زمان:</b> {time}', parse_mode='HTML'
                 )
                 return
             
@@ -1289,8 +1296,20 @@ class Arz:
             instruction = (
                 f"تو مشاور مالی ربات قیمت‌نما هستی.\n"
                 f"نام کاربر: {name_user}\n"
+                "قابلیت‌های ربات و راهنمای استفاده:\n"
+                "1. گزارش خودکار قیمت: کاربر با دستور /set ساعت‌ها را به وقت تهران تنظیم می‌کند؛ "
+                "مثال: /set 8:15 10:35 18 22. گزارش در همان گفتگو ارسال می‌شود. "
+                "برای دیدن ساعت‌های ثبت‌شده /myschedule و برای لغو گزارش خودکار همان گفتگو /unset را بفرستد.\n"
+                "2. Inline Mode: کاربر در هر چت عبارت @arzpricekshbot را همراه کلیدواژه‌ای مثل دلار، تتر، یورو، طلا یا سکه وارد می‌کند "
+                "و نتیجه را برای اشتراک‌گذاری انتخاب می‌کند. بدون کلیدواژه، همه گزینه‌ها نمایش داده می‌شوند.\n"
+                "3. مبدل ارز و طلا: کاربر دکمه «🧮 مبدل ارز و طلا به ریال 🧮» را می‌زند و سپس مقدار و مورد را می‌فرستد؛ "
+                "نمونه‌های پشتیبانی‌شده: 10 دلار، 25 یورو، 30 ریال عمان، 30 گرم طلا یا 30 گرم. "
+                "محاسبه با نرخ دریافتی از API انجام می‌شود و نتیجه به تومان است.\n"
+                "اگر کاربر درباره این قابلیت‌ها سؤال کرد، فقط همین رفتار و دستورهای واقعی را توضیح بده. "
+                "ادعا نکن که خودت می‌توانی زمان‌بندی را تنظیم یا لغو کنی؛ کاربر باید دستور مربوط را اجرا کند.\n"
                 "قوانین:\n"
                 "1. اگر سوال مربوط به بازار و قیمت بود از نرخ‌ها استفاده کن، وگرنه متناسب با سوال پاسخ بده.\n"
+                "2. اگه کاربر سلام کرد، سلام کن در غیر اینصورت به چت ادامه بده.\n"
                 "3. به هیچ وجه از ستاره (* یا **) استفاده نکن.\n"
                 "4. برای برجسته‌سازی از تگ HTML مثل <b>متن</b> یا ایموجی استفاده کن."
             )
@@ -1377,7 +1396,7 @@ if __name__ == '__main__':
     application.post_init = post_init
 
     button_text = ['💱 خلاصه قیمت ها 🪙', '🪙 قیمت سکه 🪙', '💰 قیمت طلا 💰', '💱 قیمت ارز ها 💱', 
-        '🚗 خودرو های وارداتی 🚗', '🚗 خودرو های داخلی 🚗', '🧮 مبدل ارز و طلا به ریال 🧮', 'هیوندای',
+        '🚗 خودرو های وارداتی 🚗', '🚗 خودرو های داخلی 🚗', '🧮 مبدل ارز و طلا به تومان 🧮', 'هیوندای',
         'کیا', 'تویوتا', 'بنز', 'بی ام و', 'فولکس واگن', 'مزدا', 'ولوو', 'آئودی', 'نیسان', 'هوندا', 'میتسوبیشی',
         'MG', 'BYD', 'GAC', 'چانگان', 'ونوسیا', 'اشکودا', 'سایپا', 'ایران خودرو', 'سایر', 'بهمن موتور', 'مدیران خودرو', 'کرمان موتور', '🔙 بازگشت'
     ]
@@ -1395,6 +1414,7 @@ if __name__ == '__main__':
     application.add_handler(CommandHandler("help", arz.help))
     application.add_handler(InlineQueryHandler(arz.inline_query_handler))
     application.add_handler(MessageHandler(filters.Regex(pattern), arz.take_price))
+    application.add_handler(MessageHandler(filters.Regex(r'^🔎 Inline Mode \| جستجو سریع در چت 🔎$'), arz.inlinemode))
     application.add_handler(MessageHandler(filters.Regex(r'^⚙️ پنل مدیریت ⚙️$'), arz.admin_panel))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, arz.genai_handler, block=False))
     application.add_handler(CallbackQueryHandler(arz.handle_panel))
