@@ -20,7 +20,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.8.0'
+VERSION = '4.8.1'
 
 class Arz:
     def __init__(self):
@@ -1046,6 +1046,8 @@ class Arz:
             flag = False
             today = datetime.now(self.tehran).strftime('%m/%d/%Y')
             tala_data = self.data['gold'] if self.data['date'] == today else []
+            global_data = self.data.get('global_gold', []) if self.data['date'] == today else []
+            silver_data = self.data.get('silver', []) if self.data['date'] == today else [] 
 
             if self.data['date'] != today:
                 self.data['date'] = today
@@ -1055,8 +1057,22 @@ class Arz:
                 self.data['gold'] = tala_data
                 flag = True
 
+            if gold_global['price'] not in global_data:
+                global_data.append(gold_global['price'])
+                self.data['global_gold'] = global_data
+                flag = True
+
+            if silver['price'] not in silver_data:
+                silver_data.append(silver['price'])
+                self.data['silver'] = silver_data
+                flag = True
+
             max_price = max(tala_data)
             min_price = min(tala_data)
+            global_max = max(global_data)
+            global_min = min(global_data)
+            silver_max = max(silver_data)
+            silver_min = min(silver_data)
 
             await sent.edit_text('📨 در حال آماده‌سازی گزارش...')
 
@@ -1067,8 +1083,8 @@ class Arz:
                 <table bordered compact>
                     <tr><th>شاخص</th><th>💵 مقدار</th><th>⬆️ بیشینه</th><th>⬇️ کمینه</th><th>🫧 حباب</th></tr>
                     <tr align="center"><td>💰 طلای 18 عیار</td><td>{int(tala_18['price']):,}</td><td>{max_price:,}</td><td>{min_price:,}</td><td>{int(tala_18['bubble']['amount']):,}</td></tr>
-                    <tr align="center"><td>🥇 انس طلا</td><td>{gold_global['price']}</td><td>null</td><td>null</td><td>null</td></tr>
-                    <tr align="center"><td>🥈 انس نقره</td><td>{silver['price']}</td><td>null</td><td>null</td><td>null</td></tr>
+                    <tr align="center"><td>🥇 انس طلا</td><td>{gold_global['price']}</td><td>{global_max}</td><td>{global_min}</td><td>null</td></tr>
+                    <tr align="center"><td>🥈 انس نقره</td><td>{silver['price']}</td><td>{silver_max}</td><td>{silver_min}</td><td>null</td></tr>
                 </table>
             """
 
