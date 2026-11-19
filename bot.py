@@ -20,7 +20,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.8.1'
+VERSION = '4.8.2'
 
 class Arz:
     def __init__(self):
@@ -199,15 +199,31 @@ class Arz:
         if not users:
             return
 
+        full_prompt = f"""
+                آپدیت نسخه v{VERSION} منتشر شد.
+                قابلیت ها :
+                1: دکمه جستجو سریع اضافه شده. با این کاربر میتونه قیمت ها رو با دوستان یا همین چت فعلی داشته باشه.
+                2. هوش مصنوعی Gemini یعنی (تو) میتونه تاریخچه کاربر رو سیو کنه.
+                3. در اخر بگو برای اعمال آپدیت دستور /update رو بفرسته
+                این قابلیت ها رو به کاربر با مثال توضیح بده
+                ⚠️ قوانین مهم نگارشی:
+                1. به هیچ وجه از علامت ستاره (* یا **) برای بولد کردن یا لیست‌سازی استفاده نکن.
+                2. اگر خواسته‌ایی چیزی را برجسته کنی یا تیتربندی کنی، از اعداد یا ایموجی‌ها استفاده کن و به جای ستاره از تگ‌های HTML مثل <b>متن</b> بهره ببر.
+        """
+        try: 
+            result = await self.client.aio.interactions.create(model='gemini-3.5-flash-lite', input=full_prompt)
+            text = result.output_text
+        except Exception:
+            text = (f'✨ آپدیت نسخه‌ی جدید v{VERSION} منتشر شد.\n\n'
+                '🔄 برای دریافت آخرین تغییرات، دستور زیر را بفرستید:\n'
+                '/update'
+            )
         new_users = []
         for user in users:
             try:
                 await context.bot.send_message(
                     chat_id=user['ID'],
-                    text=f'✨ آپدیت نسخه‌ی جدید v{VERSION} منتشر شد.\n\n'
-                        '🔄 برای دریافت آخرین تغییرات، دستور زیر را بفرستید:\n'
-                        '/update'
-                )
+                    text=text)
                 new_users.append(user)
 
             except Exception:
@@ -221,7 +237,6 @@ class Arz:
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat = update.effective_chat
         user = update.effective_user
-        chat_id = chat.id
 
         if chat.type == 'private' and user.id == ADMIN_ID:
             keyboard = self.admin_keyborad
@@ -232,8 +247,6 @@ class Arz:
             name = chat.title
         else:
             name = user.full_name
-
-        self.check_user(name, chat_id)
 
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True).to_dict()
 
@@ -265,7 +278,8 @@ class Arz:
             </tg-button-row>
         """
 
-        await self.send_rich_message(chat_id, html, reply_markup)
+        await self.send_rich_message(chat.id, html, reply_markup)
+        self.check_user(name, chat.id)
         return
 
     async def update(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -277,13 +291,6 @@ class Arz:
             keyboard = self.admin_keyborad
         else:
             keyboard = self.keyboard
-
-        if chat.type in ['group', 'supergroup']:
-            name = chat.title
-        else:
-            name = user.full_name
-
-        self.check_user(name, chat_id)
 
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True).to_dict()
 
@@ -312,7 +319,7 @@ class Arz:
         <table bordered striped compact>
         <tr><th>🎯 کاربرد</th><th>⌨️ دستور</th></tr>
         <tr><td>🚀 شروع و نمایش منو</td><td>/start</td></tr>
-        <tr><td>✨ تغییرات نسخه</td><td>/update</td></tr>
+        <tr><td>✨ قابلیت های ربات</td><td>/options</td></tr>
         <tr><td>⏰ تنظیم گزارش خودکار</td><td>/set</td></tr>
         <tr><td>🗓️ دیدن ساعت‌های فعال</td><td>/myschedule</td></tr>
         <tr><td>⏸️ توقف گزارش زمان‌بندی‌شده</td><td>/unset</td></tr>
@@ -511,6 +518,14 @@ class Arz:
         if not msg:
             await update.message.reply_text('✍️ متن پیام رو هم بنویس. نمونه:\n/manager all سلام\n/manager 123456789 سلام')
             return
+        
+        try:
+            result = await self.client.aio.interactions.create(model='gemini-3.5-flash-lite', input=msg)
+            send = await update.message.reply_text('🤖 در حال آماده سازی پاسخ از Gemini...')
+            text = result.output_text
+            await send.delete()
+        except Exception:
+            text = f'📨 پیام از مدیر برای شما:\n\n{msg}'
 
         if target.lower() == 'all':
             users = self.load_state()
@@ -521,7 +536,7 @@ class Arz:
                 if chat_id is None:
                     continue
                 try:
-                    await context.bot.send_message(chat_id=chat_id, text=f'📨 پیام از مدیر برای شما:\n\n{msg}')
+                    await context.bot.send_message(chat_id=chat_id, text=text)
                     sent += 1
                 except Exception:
                     failed += 1
@@ -531,7 +546,7 @@ class Arz:
         elif target.isdigit() or (target.startswith('-') and target[1:].isdigit()):
             try:
                 chat_id = int(target)
-                await context.bot.send_message(chat_id=chat_id, text=f'📨 پیام از مدیر برای شما:\n\n{msg}')
+                await context.bot.send_message(chat_id=chat_id, text=text)
                 await update.message.reply_text(f'✅ پیام با موفقیت به آیدی {chat_id} رسید.')
             except Exception as exc:
                 await update.message.reply_text(f'❌ ارسال پیام به آیدی {target} ناموفق بود.\nجزئیات: {exc}')
@@ -550,7 +565,7 @@ class Arz:
             return
         
         msg = text.replace('/send', '').strip()
-        await context.bot.send_message(chat_id=ADMIN_ID, text=f'📨 پیام از {update.effective_user.full_name} (<code>{update.effective_user.id}</code>)\nID: {update.effective_user.username}\n\n{msg}', parse_mode='HTML')
+        await context.bot.send_message(chat_id=ADMIN_ID, text=f'📨 پیام از کاربر:\n{update.effective_user.full_name} (<code>{update.effective_user.id}</code>)\nID: {update.effective_user.username}\n\n{msg}', parse_mode='HTML')
         await update.message.reply_text('✅ پیامت برای مدیر فرستاده شد.')
 
     async def inline_query_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -750,6 +765,7 @@ class Arz:
         await update.inline_query.answer(query_list, cache_time=1)
 
     async def inlinemode(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await self.reaction(update, context)
         keyboard = [
             [InlineKeyboardButton("🔎 جستجو سریع با دوستان 🔎", switch_inline_query="")],
             [InlineKeyboardButton("🔎 جستجو سریع در چت فعلی 🔎", switch_inline_query_current_chat="")]
@@ -1322,9 +1338,12 @@ class Arz:
                 "محاسبه با نرخ دریافتی از API انجام می‌شود و نتیجه به تومان است.\n"
                 "اگر کاربر درباره این قابلیت‌ها سؤال کرد، فقط همین رفتار و دستورهای واقعی را توضیح بده. "
                 "ادعا نکن که خودت می‌توانی زمان‌بندی را تنظیم یا لغو کنی؛ کاربر باید دستور مربوط را اجرا کند.\n"
+                "4. کاربر میتونه با دستور /send نظرات، پیشنهادات خود را به مالک از طریق ربات انتقال دهد.\n"
+                "مثال: /send سلام این یک پیام برای مدیر است.\n"
+                "پس از ارسال مدیر میتونه از طریق ربات  به کاربر جواب بده.\n"
                 "قوانین:\n"
                 "1. اگر سوال مربوط به بازار و قیمت بود از نرخ‌ها استفاده کن، وگرنه متناسب با سوال پاسخ بده.\n"
-                "2. اگه کاربر سلام کرد، سلام کن در غیر اینصورت به چت ادامه بده.\n"
+                "2. به کاربر سلام نکن اگه سلام نفرستاد.\n"
                 "3. به هیچ وجه از ستاره (* یا **) استفاده نکن.\n"
                 "4. برای برجسته‌سازی از تگ HTML مثل <b>متن</b> یا ایموجی استفاده کن."
             )
