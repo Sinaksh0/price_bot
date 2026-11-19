@@ -518,10 +518,10 @@ class Arz:
         if not msg:
             await update.message.reply_text('✍️ متن پیام رو هم بنویس. نمونه:\n/manager all سلام\n/manager 123456789 سلام')
             return
-        
+
+        send = await update.message.reply_text('🤖 پیامت را از طریق Gemini برای کاربر میفرستم...')
         try:
-            result = await self.client.aio.interactions.create(model='gemini-3.5-flash-lite', input=msg)
-            send = await update.message.reply_text('🤖 در حال آماده سازی پاسخ از Gemini...')
+            result = await self.client.aio.interactions.create(model='gemini-3.5-flash-lite', input=f'به کاربر بگو که پیام مدیر برای تو اینه:\n{msg}')
             text = result.output_text
             await send.delete()
         except Exception:
