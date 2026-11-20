@@ -20,7 +20,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.8.2'
+VERSION = '4.8.3'
 
 class Arz:
     def __init__(self):
@@ -519,9 +519,16 @@ class Arz:
             await update.message.reply_text('✍️ متن پیام رو هم بنویس. نمونه:\n/manager all سلام\n/manager 123456789 سلام')
             return
 
-        send = await update.message.reply_text('🤖 پیامت را از طریق Gemini برای کاربر میفرستم...')
+        input_prompt = f"""
+            به کاربر بگو که پیام مدیر برای تو اینه:
+            {msg}
+            ⚠️ قوانین مهم نگارشی:
+            1. به هیچ وجه از علامت ستاره (* یا **) برای بولد کردن یا لیست‌سازی استفاده نکن.
+            2. اگر خواسته‌ایی چیزی را برجسته کنی یا تیتربندی کنی، از اعداد یا ایموجی‌ها استفاده کن و به جای ستاره از تگ‌های HTML مثل <b>متن</b> بهره ببر.
+        """
+        send = await update.message.reply_text('🤖 پیامت رو با از طریق Gemini برای کاربر میفرستم...')
         try:
-            result = await self.client.aio.interactions.create(model='gemini-3.5-flash-lite', input=f'به کاربر بگو که پیام مدیر برای تو اینه:\n{msg}')
+            result = await self.client.aio.interactions.create(model='gemini-3.5-flash-lite', input=input_prompt)
             text = result.output_text
             await send.delete()
         except Exception:
@@ -536,7 +543,7 @@ class Arz:
                 if chat_id is None:
                     continue
                 try:
-                    await context.bot.send_message(chat_id=chat_id, text=text)
+                    await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='HTML')
                     sent += 1
                 except Exception:
                     failed += 1
@@ -546,7 +553,7 @@ class Arz:
         elif target.isdigit() or (target.startswith('-') and target[1:].isdigit()):
             try:
                 chat_id = int(target)
-                await context.bot.send_message(chat_id=chat_id, text=text)
+                await context.bot.send_message(chat_id=chat_id, text=text, parse_mode='HTML')
                 await update.message.reply_text(f'✅ پیام با موفقیت به آیدی {chat_id} رسید.')
             except Exception as exc:
                 await update.message.reply_text(f'❌ ارسال پیام به آیدی {target} ناموفق بود.\nجزئیات: {exc}')
@@ -565,7 +572,7 @@ class Arz:
             return
         
         msg = text.replace('/send', '').strip()
-        await context.bot.send_message(chat_id=ADMIN_ID, text=f'📨 پیام از کاربر:\n{update.effective_user.full_name} (<code>{update.effective_user.id}</code>)\nID: {update.effective_user.username}\n\n{msg}', parse_mode='HTML')
+        await context.bot.send_message(chat_id=ADMIN_ID, text=f'📨 پیام از کاربر:\n{update.effective_user.full_name} (<code>{update.effective_user.id}</code>)\nID: @{update.effective_user.username}\n\n{msg}', parse_mode='HTML')
         await update.message.reply_text('✅ پیامت برای مدیر فرستاده شد.')
 
     async def inline_query_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
