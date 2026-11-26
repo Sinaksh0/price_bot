@@ -495,7 +495,7 @@ class Arz:
             for user in data:
                 message += f'<li>{user['Name']} (->) <code>{user['ID']}</code></li>'
             message += '</ol>'
-            await self.send_rich_message(update.effective_chat.id, message, InlineKeyboardMarkup(keyboard).to_dict(), 'editMessageText', message_id)
+            await self.send_rich_message(update.effective_chat.id, message, InlineKeyboardMarkup(keyboard).to_dict(), 'editMessageText', message_id, False)
 
         elif choose == 'messages':
             await query.edit_message_text('📨 برای ارسال پیام، دستور /manager رو با گیرنده و متن بفرست.\nنمونه: /manager all سلام', reply_markup=InlineKeyboardMarkup(keyboard))
@@ -911,13 +911,13 @@ class Arz:
         
         return html
 
-    async def send_rich_message(self, chat_id: int, html_content: str, reply_markup=None, method: str = 'sendRichMessage', message_id: int = None):
+    async def send_rich_message(self, chat_id: int, html_content: str, reply_markup=None, method: str = 'sendRichMessage', message_id: int = None, rtl: bool = True):
         url = f"https://api.telegram.org/bot{BOT_TOKEN}"
         body = {
             "chat_id": chat_id,
             "rich_message": {
                 "html": html_content.strip(),
-                "is_rtl": True
+                "is_rtl": rtl
             }
         }
 
