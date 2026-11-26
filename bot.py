@@ -20,7 +20,7 @@ GIT = os.getenv('GIT_Token')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 KEY = os.getenv('Key')
 API_GEN = os.getenv('Gen_API')
-VERSION = '4.8.3'
+VERSION = '4.8.4'
 
 class Arz:
     def __init__(self):
@@ -477,6 +477,8 @@ class Arz:
 
     async def handle_panel(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = update.callback_query
+        message_id = query.message.message_id
+
         await query.answer(text='⚙️ در حال پردازش درخواست...', show_alert=False)
 
         keyboard = [
@@ -487,13 +489,13 @@ class Arz:
         if choose == 'users':
             data = self.load_state()
             count = len(data)
-            message = f'👥 کاربران ثبت‌شده: {count}\n'
-            message += '📋 فهرست کاربران\n\n'
-            for i, user in enumerate(data, start=1):
-                message += (
-                    f'{i}. {user['Name']} (->) <code>{user['ID']}</code>\n\n'
-                )
-            await query.edit_message_text(message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
+            message = f'<h1>👥 کاربران ثبت‌شده: {count}</h1>\n'
+            message += '<h2>📋 فهرست کاربران</h2>\n\n'
+            message += '<ol>'
+            for user in data:
+                message += f'<li>{user['Name']} (->) <code>{user['ID']}</code></li>'
+            message += '</ol>'
+            await self.send_rich_message(update.effective_chat.id, message, InlineKeyboardMarkup(keyboard).to_dict(), 'editMessageText', message_id)
 
         elif choose == 'messages':
             await query.edit_message_text('📨 برای ارسال پیام، دستور /manager رو با گیرنده و متن بفرست.\nنمونه: /manager all سلام', reply_markup=InlineKeyboardMarkup(keyboard))
@@ -909,7 +911,7 @@ class Arz:
         
         return html
 
-    async def send_rich_message(self, chat_id: int, html_content: str, reply_markup=None):
+    async def send_rich_message(self, chat_id: int, html_content: str, reply_markup=None, method: str = 'sendRichMessage', message_id: int = None):
         url = f"https://api.telegram.org/bot{BOT_TOKEN}"
         body = {
             "chat_id": chat_id,
@@ -922,8 +924,11 @@ class Arz:
         if reply_markup:
             body['reply_markup'] = reply_markup
 
+        if message_id:
+             body['message_id'] = message_id
+
         async with aiohttp.ClientSession() as session:
-            async with session.post(f'{url}/sendRichMessage', json=body) as response:
+            async with session.post(f'{url}/{method}', json=body) as response:
                 if not response.ok:
                     error = await response.text()
                     await session.post(f'{url}/sendMessage', json={
@@ -941,7 +946,6 @@ class Arz:
     
     async def take_price(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = update.message.text
-        self.data = self.load_price()
 
         if text is None:
             return
@@ -949,6 +953,7 @@ class Arz:
 
         try:
             data = await self.get_arz(MAIN_API)
+            self.data = self.load_price()
         except requests.exceptions.RequestException:
             await update.message.reply_text("❌ دریافت اطلاعات ناموفق بود. لطفاً کمی بعد دوباره تلاش کن.")
             return
@@ -1340,7 +1345,7 @@ class Arz:
                 "برای دیدن ساعت‌های ثبت‌شده /myschedule و برای لغو گزارش خودکار همان گفتگو /unset را بفرستد.\n"
                 "2. Inline Mode: کاربر در هر چت عبارت @arzpricekshbot را همراه کلیدواژه‌ای مثل دلار، تتر، یورو، طلا یا سکه وارد می‌کند "
                 "و نتیجه را برای اشتراک‌گذاری انتخاب می‌کند. بدون کلیدواژه، همه گزینه‌ها نمایش داده می‌شوند.\n"
-                "3. مبدل ارز و طلا: کاربر دکمه «🧮 مبدل ارز و طلا به ریال 🧮» را می‌زند و سپس مقدار و مورد را می‌فرستد؛ "
+                "3. مبدل ارز و طلا: کاربر دکمه «🧮 مبدل ارز و طلا به تومان 🧮» را می‌زند و سپس مقدار و مورد را می‌فرستد؛ "
                 "نمونه‌های پشتیبانی‌شده: 10 دلار، 25 یورو، 30 ریال عمان، 30 گرم طلا یا 50.25 گرم یا 20.5 طلا. "
                 "محاسبه با نرخ دریافتی از API انجام می‌شود و نتیجه به تومان است.\n"
                 "اگر کاربر درباره این قابلیت‌ها سؤال کرد، فقط همین رفتار و دستورهای واقعی را توضیح بده. "
